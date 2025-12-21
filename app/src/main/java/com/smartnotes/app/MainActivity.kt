@@ -14,7 +14,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -38,7 +37,7 @@ class MainActivity : AppCompatActivity() {
 
     private var allNotes: List<Note> = emptyList()
     private var currentSortMode = SortMode.DATE_NEWEST
-    private var isGridView = false // false = list, true = grid
+    private var isGridView = false
 
     enum class SortMode {
         DATE_NEWEST, DATE_OLDEST, TITLE_AZ, TITLE_ZA
@@ -382,41 +381,43 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
-
-        val viewToggleItem = menu?.findItem(R.id.action_toggle_view)
-        viewToggleItem?.setIcon(
-            if (isGridView) android.R.drawable.ic_menu_sort_by_size
-            else android.R.drawable.ic_dialog_dialer
-        )
-        viewToggleItem?.title = if (isGridView) "Tampilan List" else "Tampilan Grid"
-
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.action_toggle_view -> {
-                toggleView()
+            // View Toggle
+            R.id.view_grid -> {
+                if (!isGridView) toggleView()
                 true
             }
+            R.id.view_list -> {
+                if (isGridView) toggleView()
+                true
+            }
+            // Sort Options
             R.id.sort_date_newest -> {
                 currentSortMode = SortMode.DATE_NEWEST
                 sortAndDisplayNotes()
+                Toast.makeText(this, "Diurutkan: Terbaru", Toast.LENGTH_SHORT).show()
                 true
             }
             R.id.sort_date_oldest -> {
                 currentSortMode = SortMode.DATE_OLDEST
                 sortAndDisplayNotes()
+                Toast.makeText(this, "Diurutkan: Terlama", Toast.LENGTH_SHORT).show()
                 true
             }
             R.id.sort_title_az -> {
                 currentSortMode = SortMode.TITLE_AZ
                 sortAndDisplayNotes()
+                Toast.makeText(this, "Diurutkan: A-Z", Toast.LENGTH_SHORT).show()
                 true
             }
             R.id.sort_title_za -> {
                 currentSortMode = SortMode.TITLE_ZA
                 sortAndDisplayNotes()
+                Toast.makeText(this, "Diurutkan: Z-A", Toast.LENGTH_SHORT).show()
                 true
             }
             R.id.action_about -> {

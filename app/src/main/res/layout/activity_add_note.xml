@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@color/background"
     android:fitsSystemWindows="true">
 
-    <!-- Clean App Bar -->
+    <!-- App Bar with Save Button -->
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        android:elevation="0dp"
-        android:fitsSystemWindows="true">
+        android:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -22,21 +22,42 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@android:color/transparent"
             android:paddingStart="4dp"
-            android:paddingEnd="16dp"
+            android:paddingEnd="8dp"
             app:title=""
             app:navigationIcon="@android:drawable/ic_menu_close_clear_cancel"
-            app:navigationIconTint="@color/text_primary" />
+            app:navigationIconTint="@color/text_primary">
+
+            <!-- Save Button in Toolbar -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/saveButton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="end"
+                android:text="Simpan"
+                android:textSize="14sp"
+                android:textColor="@color/white"
+                android:fontFamily="sans-serif-medium"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:visibility="gone"
+                app:backgroundTint="@color/primary"
+                app:cornerRadius="20dp"
+                app:elevation="0dp"
+                style="@style/Widget.Material3.Button" />
+
+        </androidx.appcompat.widget.Toolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Main Content - Scrollable -->
-    <androidx.core.widget.NestedScrollView
+    <!-- Main Content Area -->
+    <ScrollView
+        android:id="@+id/contentScrollView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:fillViewport="true"
         android:scrollbars="none"
-        android:overScrollMode="never"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:overScrollMode="never">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -47,7 +68,7 @@
             android:paddingTop="8dp"
             android:paddingBottom="16dp">
 
-            <!-- Title Input - Clean -->
+            <!-- Title Input -->
             <EditText
                 android:id="@+id/titleEditText"
                 android:layout_width="match_parent"
@@ -66,14 +87,14 @@
                 android:layout_marginBottom="8dp"
                 android:importantForAutofill="no" />
 
-            <!-- Content Input - Spacious -->
+            <!-- Content Input -->
             <com.smartnotes.app.RichEditText
                 android:id="@+id/contentEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Catatan"
                 android:padding="16dp"
-                android:minHeight="400dp"
+                android:minHeight="300dp"
                 android:gravity="top"
                 android:textSize="16sp"
                 android:textColor="@color/text_primary"
@@ -85,12 +106,12 @@
                 android:layout_marginBottom="16dp"
                 android:importantForAutofill="no" />
 
-            <!-- Quick Actions - Minimal -->
+            <!-- Quick Actions for View Mode -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="80dp"
+                android:layout_marginTop="8dp"
                 android:gravity="center">
 
                 <!-- Edit Button -->
@@ -100,7 +121,7 @@
                     android:layout_height="48dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"
-                    android:text="✏️ Edit"
+                    android:text="Edit"
                     android:textSize="14sp"
                     android:textColor="@color/primary"
                     android:fontFamily="sans-serif-medium"
@@ -117,7 +138,7 @@
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:text="🗑️ Hapus"
+                    android:text="Hapus"
                     android:textSize="14sp"
                     android:textColor="@color/error"
                     android:fontFamily="sans-serif-medium"
@@ -132,30 +153,28 @@
 
         </LinearLayout>
 
-    </androidx.core.widget.NestedScrollView>
+    </ScrollView>
 
-    <!-- Formatting Toolbar - Modern & Compact -->
-    <com.google.android.material.card.MaterialCardView
+    <!-- Formatting Toolbar - Flat design, menyatu dengan layar -->
+    <LinearLayout
         android:id="@+id/formattingToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        android:layout_marginBottom="76dp"
+        android:orientation="horizontal"
+        android:background="@color/surface_variant"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:gravity="center_vertical"
         android:visibility="gone"
-        app:cardCornerRadius="28dp"
-        app:cardElevation="8dp"
-        app:cardBackgroundColor="@color/white">
+        android:elevation="2dp">
 
         <HorizontalScrollView
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:scrollbars="none"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp">
+            android:layout_weight="1"
+            android:scrollbars="none">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -163,95 +182,187 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
 
-                <!-- Toolbar Buttons - Compact & Modern -->
-                <ImageButton
+                <!-- Checklist Button -->
+                <LinearLayout
                     android:id="@+id/btnCheckList"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:orientation="vertical"
+                    android:gravity="center"
                     android:layout_marginEnd="4dp"
-                    android:src="@android:drawable/checkbox_off_background"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Checklist"
-                    android:scaleType="centerInside"
-                    android:padding="10dp"
-                    android:tint="@color/text_primary" />
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless">
 
-                <ImageButton
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@android:drawable/checkbox_off_background"
+                        android:tint="@color/text_primary"
+                        android:importantForAccessibility="no" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Cklist"
+                        android:textSize="10sp"
+                        android:textColor="@color/text_tertiary"
+                        android:fontFamily="sans-serif"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+
+                <!-- H1 Button -->
+                <LinearLayout
                     android:id="@+id/btnH1"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:orientation="vertical"
+                    android:gravity="center"
                     android:layout_marginEnd="4dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Heading 1"
-                    android:scaleType="centerInside"
-                    android:padding="10dp" />
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless">
 
-                <ImageButton
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="H₁"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Besar"
+                        android:textSize="10sp"
+                        android:textColor="@color/text_tertiary"
+                        android:fontFamily="sans-serif"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
+
+                <!-- H2 Button -->
+                <LinearLayout
                     android:id="@+id/btnH2"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:orientation="vertical"
+                    android:gravity="center"
                     android:layout_marginEnd="4dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Heading 2"
-                    android:scaleType="centerInside"
-                    android:padding="10dp" />
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless">
 
-                <ImageButton
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="H₂"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sedang"
+                        android:textSize="10sp"
+                        android:textColor="@color/text_tertiary"
+                        android:fontFamily="sans-serif"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
+
+                <!-- H3 Button -->
+                <LinearLayout
                     android:id="@+id/btnH3"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:orientation="vertical"
+                    android:gravity="center"
                     android:layout_marginEnd="4dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Heading 3"
-                    android:scaleType="centerInside"
-                    android:padding="10dp" />
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless">
 
-                <ImageButton
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="H₃"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Kecil"
+                        android:textSize="10sp"
+                        android:textColor="@color/text_tertiary"
+                        android:fontFamily="sans-serif"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
+
+                <!-- Bold Button -->
+                <LinearLayout
                     android:id="@+id/btnBold"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:orientation="vertical"
+                    android:gravity="center"
                     android:layout_marginEnd="4dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/bold"
-                    android:scaleType="centerInside"
-                    android:padding="10dp" />
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless">
 
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="28dp"
-                    android:background="@color/divider"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginEnd="8dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="B"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
 
-                <ImageButton
-                    android:id="@+id/btnClose"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:src="@android:drawable/ic_menu_close_clear_cancel"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Close"
-                    android:scaleType="centerInside"
-                    android:padding="10dp"
-                    android:tint="@color/text_secondary" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tebal"
+                        android:textSize="10sp"
+                        android:textColor="@color/text_tertiary"
+                        android:fontFamily="sans-serif"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
 
             </LinearLayout>
 
         </HorizontalScrollView>
 
-    </com.google.android.material.card.MaterialCardView>
+        <!-- Close Button - Fixed on right -->
+        <LinearLayout
+            android:id="@+id/btnClose"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless">
 
-    <!-- Save FAB - Clean & Simple -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/saveButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="20dp"
-        android:contentDescription="Simpan"
-        app:srcCompat="@android:drawable/ic_menu_save"
-        app:tint="@color/white"
-        app:backgroundTint="@color/primary"
-        app:elevation="6dp"
-        app:rippleColor="@color/primary_light" />
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                android:tint="@color/text_secondary"
+                android:importantForAccessibility="no" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tutup"
+                android:textSize="10sp"
+                android:textColor="@color/text_tertiary"
+                android:fontFamily="sans-serif"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

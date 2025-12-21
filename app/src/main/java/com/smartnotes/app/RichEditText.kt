@@ -2,6 +2,7 @@ package com.smartnotes.app
 
 import android.content.Context
 import android.graphics.Typeface
+import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.StrikethroughSpan
@@ -29,7 +30,12 @@ class RichEditText @JvmOverloads constructor(
         val end = selectionEnd
 
         if (start >= 0 && end > start) {
-            val spannable = text as? SpannableStringBuilder ?: SpannableStringBuilder(text)
+            val editable = text ?: return
+            val spannable = if (editable is SpannableStringBuilder) {
+                editable
+            } else {
+                SpannableStringBuilder(editable)
+            }
 
             val spans = spannable.getSpans(start, end, UnderlineSpan::class.java)
             if (spans.isEmpty()) {
@@ -43,6 +49,7 @@ class RichEditText @JvmOverloads constructor(
                 spans.forEach { spannable.removeSpan(it) }
             }
 
+            // Update text and restore selection
             setText(spannable)
             setSelection(start, end)
         }
@@ -53,7 +60,12 @@ class RichEditText @JvmOverloads constructor(
         val end = selectionEnd
 
         if (start >= 0 && end > start) {
-            val spannable = text as? SpannableStringBuilder ?: SpannableStringBuilder(text)
+            val editable = text ?: return
+            val spannable = if (editable is SpannableStringBuilder) {
+                editable
+            } else {
+                SpannableStringBuilder(editable)
+            }
 
             val spans = spannable.getSpans(start, end, StrikethroughSpan::class.java)
             if (spans.isEmpty()) {
@@ -67,6 +79,7 @@ class RichEditText @JvmOverloads constructor(
                 spans.forEach { spannable.removeSpan(it) }
             }
 
+            // Update text and restore selection
             setText(spannable)
             setSelection(start, end)
         }
@@ -104,12 +117,18 @@ class RichEditText @JvmOverloads constructor(
         val end = selectionEnd
 
         if (start >= 0 && end > start) {
-            val spannable = text as? SpannableStringBuilder ?: SpannableStringBuilder(text)
+            val editable = text ?: return
+            val spannable = if (editable is SpannableStringBuilder) {
+                editable
+            } else {
+                SpannableStringBuilder(editable)
+            }
 
             val existingSpans = spannable.getSpans(start, end, StyleSpan::class.java)
             val hasStyle = existingSpans.any { it.style == style }
 
             if (!hasStyle) {
+                // Apply style
                 spannable.setSpan(
                     StyleSpan(style),
                     start,
@@ -117,11 +136,13 @@ class RichEditText @JvmOverloads constructor(
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
             } else {
+                // Remove style
                 existingSpans.filter { it.style == style }.forEach {
                     spannable.removeSpan(it)
                 }
             }
 
+            // IMPORTANT: Update text and restore selection
             setText(spannable)
             setSelection(start, end)
         }
@@ -132,6 +153,11 @@ class RichEditText @JvmOverloads constructor(
     }
 
     fun setFormattedText(formattedText: CharSequence) {
-        setText(formattedText)
+        try {
+            setText(formattedText)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            setText(formattedText.toString())
+        }
     }
 }

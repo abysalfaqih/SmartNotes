@@ -2,38 +2,50 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- Toggle View Icon -->
-    <item
-        android:id="@+id/action_toggle_view"
-        android:title="Tampilan"
-        android:icon="@android:drawable/ic_dialog_dialer"
-        app:showAsAction="ifRoom"
-        android:orderInCategory="1" />
-
-    <!-- Sort Menu -->
+    <!-- Sort Menu with View Toggle inside -->
     <item
         android:id="@+id/action_sort"
         android:title="@string/sort_by"
         android:icon="@android:drawable/ic_menu_sort_by_size"
         app:showAsAction="ifRoom"
-        android:orderInCategory="2">
+        android:orderInCategory="1">
         <menu>
+            <!-- View Toggle Options -->
+            <item
+                android:id="@+id/view_grid"
+                android:title="@string/grid_view"
+                android:icon="@android:drawable/ic_dialog_dialer"
+                android:orderInCategory="1" />
+            <item
+                android:id="@+id/view_list"
+                android:title="@string/list_view"
+                android:icon="@android:drawable/ic_menu_sort_by_size"
+                android:orderInCategory="2" />
+
+            <!-- Divider -->
+            <item
+                android:id="@+id/divider1"
+                android:title="────────"
+                android:enabled="false"
+                android:orderInCategory="3" />
+
+            <!-- Sort Options -->
             <item
                 android:id="@+id/sort_date_newest"
                 android:title="@string/sort_by_date_newest"
-                android:orderInCategory="1" />
+                android:orderInCategory="4" />
             <item
                 android:id="@+id/sort_date_oldest"
                 android:title="@string/sort_by_date_oldest"
-                android:orderInCategory="2" />
+                android:orderInCategory="5" />
             <item
                 android:id="@+id/sort_title_az"
                 android:title="@string/sort_by_title_az"
-                android:orderInCategory="3" />
+                android:orderInCategory="6" />
             <item
                 android:id="@+id/sort_title_za"
                 android:title="@string/sort_by_title_za"
-                android:orderInCategory="4" />
+                android:orderInCategory="7" />
         </menu>
     </item>
 
