@@ -1,6 +1,7 @@
 package com.smartnotes.app
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,8 +14,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.smartnotes.app.data.Note
 import com.smartnotes.app.data.NoteDaoImpl
@@ -31,9 +34,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var toolbar: androidx.appcompat.widget.Toolbar
     private lateinit var selectionToolbar: androidx.appcompat.widget.Toolbar
     private lateinit var fabAddNote: ExtendedFloatingActionButton
+    private lateinit var prefs: SharedPreferences
 
     private var allNotes: List<Note> = emptyList()
     private var currentSortMode = SortMode.DATE_NEWEST
+    private var isGridView = false // false = list, true = grid
 
     enum class SortMode {
         DATE_NEWEST, DATE_OLDEST, TITLE_AZ, TITLE_ZA
@@ -43,11 +48,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        prefs = getSharedPreferences("smart_notes_prefs", MODE_PRIVATE)
+        isGridView = prefs.getBoolean("is_grid_view", false)
+
         toolbar = findViewById(R.id.toolbar)
         selectionToolbar = findViewById(R.id.selectionToolbar)
         setSupportActionBar(toolbar)
 
-        // Force menu to use light theme
         toolbar.popupTheme = R.style.ThemeOverlay_AppCompat_Light
 
         val noteDao = NoteDaoImpl(this)
@@ -70,10 +77,8 @@ class MainActivity : AppCompatActivity() {
             }
         )
 
-        notesRecyclerView.layoutManager = LinearLayoutManager(this)
-        notesRecyclerView.adapter = adapter
+        setupRecyclerView()
 
-        // Add scroll listener for FAB animation
         notesRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -99,6 +104,33 @@ class MainActivity : AppCompatActivity() {
         })
 
         setupSelectionToolbar()
+    }
+
+    private fun setupRecyclerView() {
+        notesRecyclerView.layoutManager = if (isGridView) {
+            StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        } else {
+            LinearLayoutManager(this)
+        }
+        notesRecyclerView.adapter = adapter
+    }
+
+    private fun toggleView() {
+        isGridView = !isGridView
+        prefs.edit().putBoolean("is_grid_view", isGridView).apply()
+
+        notesRecyclerView.layoutManager = if (isGridView) {
+            StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        } else {
+            LinearLayoutManager(this)
+        }
+
+        notesRecyclerView.adapter = adapter
+
+        val message = if (isGridView) "Tampilan Grid" else "Tampilan List"
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+
+        invalidateOptionsMenu()
     }
 
     private fun showNoteOptionsDialog(note: Note) {
@@ -150,14 +182,17 @@ class MainActivity : AppCompatActivity() {
     private fun showColorDialog(note: Note) {
         val colors = arrayOf(
             "Default" to "#FFFFFF",
-            "Merah" to "#FFE5E5",
-            "Pink" to "#FFE5F3",
-            "Ungu" to "#F3E8FF",
-            "Biru" to "#E0F2FE",
-            "Cyan" to "#CFFAFE",
-            "Hijau" to "#D1FAE5",
-            "Kuning" to "#FEF9C3",
-            "Orange" to "#FFEDD5"
+            "Merah" to "#F28B82",
+            "Orange" to "#FBBC04",
+            "Kuning" to "#FFF475",
+            "Hijau" to "#CCFF90",
+            "Teal" to "#A7FFEB",
+            "Biru" to "#CBF0F8",
+            "Biru Tua" to "#AECBFA",
+            "Ungu" to "#D7AEFB",
+            "Pink" to "#FDCFE8",
+            "Coklat" to "#E6C9A8",
+            "Abu-abu" to "#E8EAED"
         )
 
         val colorNames = colors.map { it.first }.toTypedArray()
@@ -347,13 +382,23 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
-        menu?.findItem(R.id.action_sort)?.isVisible = true
-        menu?.findItem(R.id.action_about)?.isVisible = true
+
+        val viewToggleItem = menu?.findItem(R.id.action_toggle_view)
+        viewToggleItem?.setIcon(
+            if (isGridView) android.R.drawable.ic_menu_sort_by_size
+            else android.R.drawable.ic_dialog_dialer
+        )
+        viewToggleItem?.title = if (isGridView) "Tampilan List" else "Tampilan Grid"
+
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.action_toggle_view -> {
+                toggleView()
+                true
+            }
             R.id.sort_date_newest -> {
                 currentSortMode = SortMode.DATE_NEWEST
                 sortAndDisplayNotes()

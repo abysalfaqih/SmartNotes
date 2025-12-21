@@ -24,6 +24,10 @@
     <string name="empty_title_error">Judul tidak boleh kosong</string>
     <string name="empty_content_error">Konten tidak boleh kosong</string>
     <string name="delete_confirmation">Hapus catatan ini?</string>
+    <string name="unsaved_changes">Catatan Belum Disimpan</string>
+    <string name="unsaved_changes_message">Anda memiliki perubahan yang belum disimpan. Apakah Anda yakin ingin keluar?</string>
+    <string name="discard">Buang</string>
+    <string name="cancel">Batal</string>
     <string name="yes">Ya</string>
     <string name="no">Tidak</string>
 
@@ -41,6 +45,9 @@
     <string name="selected_count">%d dipilih</string>
     <string name="delete_selected_confirmation">Hapus %d catatan yang dipilih?</string>
     <string name="notes_deleted">%d catatan berhasil dihapus</string>
+    <string name="view_toggle">Ganti Tampilan</string>
+    <string name="grid_view">Tampilan Grid</string>
+    <string name="list_view">Tampilan List</string>
 
     <!-- Rich Text Editor -->
     <string name="bold">Tebal</string>
@@ -53,6 +60,7 @@
     <string name="heading_2">Heading 2</string>
     <string name="heading_3">Heading 3</string>
     <string name="close_toolbar">Tutup Toolbar</string>
+    <string name="select_text_first">Pilih teks terlebih dahulu</string>
 
     <!-- About -->
     <string name="about_title">Tentang SmartNotes</string>

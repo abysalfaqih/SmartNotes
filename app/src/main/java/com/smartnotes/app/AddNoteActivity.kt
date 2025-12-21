@@ -9,7 +9,6 @@ import android.text.style.StyleSpan
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -31,10 +30,6 @@ class AddNoteActivity : AppCompatActivity() {
     private lateinit var deleteButton: MaterialButton
     private lateinit var editButton: MaterialButton
     private lateinit var formattingToolbar: MaterialCardView
-    private lateinit var categoryButton: TextView
-    private lateinit var colorButton: TextView
-    private lateinit var categoryCard: MaterialCardView
-    private lateinit var colorCard: MaterialCardView
 
     private lateinit var btnCheckList: ImageButton
     private lateinit var btnH1: ImageButton
@@ -47,6 +42,11 @@ class AddNoteActivity : AppCompatActivity() {
     private var isEditMode = false
     private var selectedCategory = "Semua"
     private var selectedColor = "#FFFFFF"
+
+    // Track if content has changed
+    private var hasUnsavedChanges = false
+    private var originalTitle = ""
+    private var originalContent = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,9 +64,10 @@ class AddNoteActivity : AppCompatActivity() {
         setupToolbarButtons()
         loadExistingNote()
         setupButtonListeners()
+        setupTextChangeListeners()
 
         toolbar.setNavigationOnClickListener {
-            finish()
+            handleBackPress()
         }
 
         updateBackgroundColor()
@@ -79,10 +80,6 @@ class AddNoteActivity : AppCompatActivity() {
         deleteButton = findViewById(R.id.deleteButton)
         editButton = findViewById(R.id.editButton)
         formattingToolbar = findViewById(R.id.formattingToolbar)
-        categoryButton = findViewById(R.id.categoryButton)
-        colorButton = findViewById(R.id.colorButton)
-        categoryCard = findViewById(R.id.categoryCard)
-        colorCard = findViewById(R.id.colorCard)
 
         btnCheckList = findViewById(R.id.btnCheckList)
         btnH1 = findViewById(R.id.btnH1)
@@ -111,9 +108,6 @@ class AddNoteActivity : AppCompatActivity() {
                 }
             }
         }
-
-        categoryCard.setOnClickListener { showCategoryDialog() }
-        colorCard.setOnClickListener { showColorDialog() }
     }
 
     private fun setupToolbarButtons() {
@@ -126,7 +120,17 @@ class AddNoteActivity : AppCompatActivity() {
         btnH1.setOnClickListener { applyHeading(1) }
         btnH2.setOnClickListener { applyHeading(2) }
         btnH3.setOnClickListener { applyHeading(3) }
-        btnBold.setOnClickListener { contentEditText.applyBold() }
+        btnBold.setOnClickListener {
+            val start = contentEditText.selectionStart
+            val end = contentEditText.selectionEnd
+
+            if (start >= 0 && end > start) {
+                contentEditText.applyBold()
+                hasUnsavedChanges = true
+            } else {
+                Toast.makeText(this, "Pilih teks terlebih dahulu", Toast.LENGTH_SHORT).show()
+            }
+        }
         btnClose.setOnClickListener {
             formattingToolbar.animate()
                 .alpha(0f)
@@ -138,38 +142,61 @@ class AddNoteActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupTextChangeListeners() {
+        titleEditText.addTextChangedListener(object : android.text.TextWatcher {
+            override fun afterTextChanged(s: android.text.Editable?) {
+                if (isEditMode) {
+                    hasUnsavedChanges = titleEditText.text.toString() != originalTitle
+                }
+            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
+        contentEditText.addTextChangedListener(object : android.text.TextWatcher {
+            override fun afterTextChanged(s: android.text.Editable?) {
+                if (isEditMode) {
+                    hasUnsavedChanges = contentEditText.text.toString() != originalContent
+                }
+            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+    }
+
     private fun loadExistingNote() {
         existingNote = intent.getParcelableExtra("note")
         existingNote?.let { note ->
             titleEditText.setText(note.title)
+            contentEditText.setText(note.content)
 
-            val spannable = SpannableStringBuilder(note.content)
-            contentEditText.setFormattedText(spannable)
+            originalTitle = note.title
+            originalContent = note.content
 
             selectedCategory = note.category
             selectedColor = note.color
 
-            updateCategoryButton()
-            updateColorButton()
             updateBackgroundColor()
-
             setViewMode()
         }
 
         if (existingNote == null) {
             isEditMode = true
             editButton.visibility = View.GONE
+            hasUnsavedChanges = false
         }
     }
 
     private fun setViewMode() {
         isEditMode = false
+        hasUnsavedChanges = false
+
         titleEditText.isFocusable = false
         titleEditText.isFocusableInTouchMode = false
         contentEditText.isFocusable = false
         contentEditText.isFocusableInTouchMode = false
-        titleEditText.setTextIsSelectable(false)
-        contentEditText.setTextIsSelectable(false)
+        titleEditText.setTextIsSelectable(true)
+        contentEditText.setTextIsSelectable(true)
 
         formattingToolbar.visibility = View.GONE
         saveButton.hide()
@@ -179,6 +206,7 @@ class AddNoteActivity : AppCompatActivity() {
 
     private fun setEditMode() {
         isEditMode = true
+
         titleEditText.isFocusable = true
         titleEditText.isFocusableInTouchMode = true
         contentEditText.isFocusable = true
@@ -224,6 +252,7 @@ class AddNoteActivity : AppCompatActivity() {
             else -> cursorPosition + checkbox.length + 1
         }
         contentEditText.setSelection(newPosition)
+        hasUnsavedChanges = true
     }
 
     private fun applyHeading(level: Int) {
@@ -238,6 +267,7 @@ class AddNoteActivity : AppCompatActivity() {
         val spannable = contentEditText.text as? SpannableStringBuilder
             ?: SpannableStringBuilder(contentEditText.text)
 
+        // Remove existing spans
         val existingSizeSpans = spannable.getSpans(start, end, AbsoluteSizeSpan::class.java)
         existingSizeSpans.forEach { spannable.removeSpan(it) }
 
@@ -267,13 +297,14 @@ class AddNoteActivity : AppCompatActivity() {
 
         contentEditText.setText(spannable)
         contentEditText.setSelection(start, end)
+        hasUnsavedChanges = true
 
         Toast.makeText(this, "Heading $level diterapkan", Toast.LENGTH_SHORT).show()
     }
 
     private fun saveNote() {
         val title = titleEditText.text.toString().trim()
-        val content = contentEditText.getCurrentFormattedText().toString().trim()
+        val content = contentEditText.text.toString().trim()
 
         if (title.isEmpty()) {
             Toast.makeText(this, R.string.empty_title_error, Toast.LENGTH_SHORT).show()
@@ -307,6 +338,11 @@ class AddNoteActivity : AppCompatActivity() {
                 repository.updateNote(existingNote!!)
 
                 Toast.makeText(this@AddNoteActivity, R.string.note_saved, Toast.LENGTH_SHORT).show()
+
+                originalTitle = title
+                originalContent = content
+                hasUnsavedChanges = false
+
                 setViewMode()
             } else {
                 val note = Note(
@@ -344,67 +380,34 @@ class AddNoteActivity : AppCompatActivity() {
         }
     }
 
-    private fun showCategoryDialog() {
-        if (!isEditMode) return
-
-        val categories = arrayOf("Semua", "Pekerjaan", "Pribadi", "Belanja", "Ide", "Lainnya")
-
-        AlertDialog.Builder(this)
-            .setTitle(R.string.select_category)
-            .setItems(categories) { _, which ->
-                selectedCategory = categories[which]
-                updateCategoryButton()
-            }
-            .show()
-    }
-
-    private fun updateCategoryButton() {
-        categoryButton.text = "📁 $selectedCategory"
-    }
-
-    private fun showColorDialog() {
-        if (!isEditMode) return
-
-        val colors = arrayOf(
-            "Default" to "#FFFFFF",
-            "Merah" to "#F28B82",
-            "Orange" to "#FBBC04",
-            "Kuning" to "#FFF475",
-            "Hijau" to "#CCFF90",
-            "Teal" to "#A7FFEB",
-            "Biru" to "#CBF0F8",
-            "Biru Tua" to "#AECBFA",
-            "Ungu" to "#D7AEFB",
-            "Pink" to "#FDCFE8",
-            "Coklat" to "#E6C9A8",
-            "Abu-abu" to "#E8EAED"
-        )
-
-        val colorNames = colors.map { it.first }.toTypedArray()
-
-        AlertDialog.Builder(this)
-            .setTitle(R.string.select_color)
-            .setItems(colorNames) { _, which ->
-                selectedColor = colors[which].second
-                updateColorButton()
-                updateBackgroundColor()
-            }
-            .show()
-    }
-
-    private fun updateColorButton() {
-        colorButton.text = "🎨 Warna"
-    }
-
     private fun updateBackgroundColor() {
         try {
             val color = android.graphics.Color.parseColor(selectedColor)
             window.decorView.setBackgroundColor(color)
-
-            categoryCard.setCardBackgroundColor(color)
-            colorCard.setCardBackgroundColor(color)
         } catch (e: Exception) {
             window.decorView.setBackgroundColor(android.graphics.Color.WHITE)
         }
+    }
+
+    private fun handleBackPress() {
+        if (hasUnsavedChanges) {
+            AlertDialog.Builder(this)
+                .setTitle("Catatan Belum Disimpan")
+                .setMessage("Anda memiliki perubahan yang belum disimpan. Apakah Anda yakin ingin keluar?")
+                .setPositiveButton("Simpan") { _, _ ->
+                    saveNote()
+                }
+                .setNegativeButton("Buang") { _, _ ->
+                    finish()
+                }
+                .setNeutralButton("Batal", null)
+                .show()
+        } else {
+            finish()
+        }
+    }
+
+    override fun onBackPressed() {
+        handleBackPress()
     }
 }

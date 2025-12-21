@@ -2,11 +2,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- Toggle View Icon -->
+    <item
+        android:id="@+id/action_toggle_view"
+        android:title="Tampilan"
+        android:icon="@android:drawable/ic_dialog_dialer"
+        app:showAsAction="ifRoom"
+        android:orderInCategory="1" />
+
+    <!-- Sort Menu -->
     <item
         android:id="@+id/action_sort"
         android:title="@string/sort_by"
         android:icon="@android:drawable/ic_menu_sort_by_size"
-        app:showAsAction="ifRoom">
+        app:showAsAction="ifRoom"
+        android:orderInCategory="2">
         <menu>
             <item
                 android:id="@+id/sort_date_newest"
@@ -27,6 +37,7 @@
         </menu>
     </item>
 
+    <!-- About -->
     <item
         android:id="@+id/action_about"
         android:title="@string/about"

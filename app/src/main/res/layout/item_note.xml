@@ -5,9 +5,9 @@
     android:id="@+id/cardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="1dp"
+    android:layout_margin="6dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground">
@@ -21,7 +21,7 @@
         <View
             android:id="@+id/accentBar"
             android:layout_width="match_parent"
-            android:layout_height="3dp"
+            android:layout_height="4dp"
             android:background="@color/primary"
             android:visibility="gone" />
 
@@ -29,7 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="16dp">
+            android:padding="14dp">
 
             <!-- Selection Checkbox -->
             <CheckBox
@@ -37,7 +37,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="10dp"
                 android:visibility="gone"
                 android:buttonTint="@color/primary"
                 android:minWidth="0dp"
@@ -55,14 +55,14 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="4dp">
+                    android:layout_marginBottom="6dp">
 
                     <TextView
                         android:id="@+id/pinIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="📌"
-                        android:textSize="14sp"
+                        android:textSize="12sp"
                         android:visibility="gone"
                         android:layout_marginEnd="6dp" />
 
@@ -72,7 +72,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Judul Catatan"
-                        android:textSize="16sp"
+                        android:textSize="15sp"
                         android:fontFamily="sans-serif-medium"
                         android:textColor="@color/text_primary"
                         android:maxLines="3"
@@ -82,51 +82,50 @@
 
                 </LinearLayout>
 
-                <!-- Content Preview - More subtle -->
+                <!-- Content Preview -->
                 <TextView
                     android:id="@+id/contentTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Isi catatan..."
-                    android:textSize="14sp"
+                    android:textSize="13sp"
                     android:textColor="@color/text_secondary"
-                    android:maxLines="10"
+                    android:maxLines="8"
                     android:ellipsize="end"
                     android:lineSpacingExtra="2dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginBottom="8dp" />
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="10dp" />
 
-                <!-- Footer - Clean & Minimal -->
+                <!-- Footer -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="4dp">
+                    android:gravity="center_vertical">
 
-                    <!-- Category Badge - Subtle -->
+                    <!-- Category Badge -->
                     <TextView
                         android:id="@+id/categoryTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Pribadi"
-                        android:textSize="11sp"
+                        android:textSize="10sp"
                         android:textColor="@color/text_tertiary"
                         android:background="@drawable/category_badge_modern"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="10dp"
-                        android:paddingTop="4dp"
-                        android:paddingBottom="4dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="3dp"
                         android:fontFamily="sans-serif-medium"
-                        android:layout_marginEnd="8dp" />
+                        android:layout_marginEnd="6dp" />
 
-                    <!-- Timestamp - Very subtle -->
+                    <!-- Timestamp -->
                     <TextView
                         android:id="@+id/timestampTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="12 Jan 2025"
-                        android:textSize="11sp"
+                        android:textSize="10sp"
                         android:textColor="@color/text_tertiary"
                         android:fontFamily="sans-serif" />
 
