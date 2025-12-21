@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Popup Menu Style -->
-    <style name="PopupMenuStyle" parent="Widget.AppCompat.PopupMenu">
+    <style name="PopupMenuStyle" parent="Widget.Material3.PopupMenu">
         <item name="android:popupBackground">@android:color/white</item>
-        <item name="android:textColor">@android:color/black</item>
+        <item name="android:popupElevation">8dp</item>
     </style>
 
-    <style name="PopupMenuTextAppearance" parent="TextAppearance.AppCompat.Widget.PopupMenu.Large">
-        <item name="android:textColor">@android:color/black</item>
+    <style name="PopupMenuTextAppearance" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">16sp</item>
     </style>
 
     <!-- Theme Overlay untuk Popup -->
-    <style name="ThemeOverlay.AppCompat.Light" parent="ThemeOverlay.AppCompat.Light">
-        <item name="android:textColorPrimary">@android:color/black</item>
-        <item name="android:textColorSecondary">@android:color/black</item>
+    <style name="ThemeOverlay.AppCompat.Light" parent="ThemeOverlay.Material3.Light">
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
         <item name="android:colorBackground">@android:color/white</item>
     </style>
 </resources>

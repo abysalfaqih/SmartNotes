@@ -166,6 +166,7 @@ class AddNoteActivity : AppCompatActivity() {
         contentEditText.setTextIsSelectable(true)
 
         saveButton.visibility = View.VISIBLE
+        deleteButton.visibility = View.VISIBLE
         editButton.visibility = View.GONE
 
         // Focus to content
@@ -175,6 +176,7 @@ class AddNoteActivity : AppCompatActivity() {
     private fun setupButtonListeners() {
         saveButton.setOnClickListener { saveNote() }
         editButton.setOnClickListener { setEditMode() }
+        deleteButton.setOnClickListener { showDeleteConfirmation() }
     }
 
     private fun insertCheckbox() {

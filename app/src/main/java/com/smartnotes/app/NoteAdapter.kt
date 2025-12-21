@@ -32,7 +32,7 @@ class NoteAdapter(
         val contentTextView: TextView = view.findViewById(R.id.contentTextView)
         val timestampTextView: TextView = view.findViewById(R.id.timestampTextView)
         val categoryTextView: TextView = view.findViewById(R.id.categoryTextView)
-        val pinIcon: android.widget.ImageView = view.findViewById(R.id.pinIcon)
+        val pinIcon: TextView = view.findViewById(R.id.pinIcon)
         val selectCheckbox: CheckBox = view.findViewById(R.id.selectCheckbox)
     }
 
@@ -75,7 +75,7 @@ class NoteAdapter(
             }
         }
 
-        // Add haptic feedback and delay for long press
+        // Long press handler
         var longPressHandler: android.os.Handler? = null
         var isLongPressTriggered = false
 
@@ -98,6 +98,8 @@ class NoteAdapter(
                             android.view.HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
                         )
                         isLongPressTriggered = true
+
+                        // Call long click callback - show menu instead of selection mode
                         onNoteLongClick(note)
 
                         // Reset scale

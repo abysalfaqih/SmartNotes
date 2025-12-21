@@ -66,10 +66,7 @@ class MainActivity : AppCompatActivity() {
                 }
             },
             onNoteLongClick = { note ->
-                enterSelectionMode()
-                note.isSelected = true
-                adapter.notifyDataSetChanged()
-                updateSelectionToolbar()
+                showNoteOptionsDialog(note)
             }
         )
 
@@ -90,6 +87,122 @@ class MainActivity : AppCompatActivity() {
         })
 
         setupSelectionToolbar()
+    }
+
+    private fun showNoteOptionsDialog(note: Note) {
+        val pinOption = if (note.isPinned) "📌 Unpin" else "📌 Pin"
+        val options = arrayOf(
+            pinOption,
+            "📁 Ubah Kategori",
+            "🎨 Ubah Warna",
+            "🗑️ Hapus"
+        )
+
+        AlertDialog.Builder(this)
+            .setTitle(note.title)
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> togglePinNote(note) // Pin/Unpin
+                    1 -> showCategoryDialog(note) // Change Category
+                    2 -> showColorDialog(note) // Change Color
+                    3 -> showDeleteConfirmation(note) // Delete
+                }
+            }
+            .setNegativeButton("Batal", null)
+            .show()
+    }
+
+    private fun showCategoryDialog(note: Note) {
+        val categories = arrayOf("Semua", "Pekerjaan", "Pribadi", "Belanja", "Ide", "Lainnya")
+        val currentIndex = categories.indexOf(note.category).takeIf { it >= 0 } ?: 0
+
+        AlertDialog.Builder(this)
+            .setTitle("Pilih Kategori")
+            .setSingleChoiceItems(categories, currentIndex) { dialog, which ->
+                lifecycleScope.launch {
+                    note.category = categories[which]
+                    repository.updateNote(note)
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Kategori diubah ke ${categories[which]}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    loadNotes()
+                    dialog.dismiss()
+                }
+            }
+            .setNegativeButton("Batal", null)
+            .show()
+    }
+
+    private fun showColorDialog(note: Note) {
+        val colors = arrayOf(
+            "Putih" to "#FFFFFF",
+            "Merah" to "#FFCDD2",
+            "Pink" to "#F8BBD0",
+            "Ungu" to "#E1BEE7",
+            "Biru" to "#BBDEFB",
+            "Cyan" to "#B2EBF2",
+            "Hijau" to "#C8E6C9",
+            "Kuning" to "#FFF9C4",
+            "Orange" to "#FFE0B2"
+        )
+
+        val colorNames = colors.map { it.first }.toTypedArray()
+        val currentIndex = colors.indexOfFirst { it.second == note.color }.takeIf { it >= 0 } ?: 0
+
+        AlertDialog.Builder(this)
+            .setTitle("Pilih Warna")
+            .setSingleChoiceItems(colorNames, currentIndex) { dialog, which ->
+                lifecycleScope.launch {
+                    note.color = colors[which].second
+                    repository.updateNote(note)
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Warna diubah ke ${colors[which].first}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    loadNotes()
+                    dialog.dismiss()
+                }
+            }
+            .setNegativeButton("Batal", null)
+            .show()
+    }
+
+    private fun togglePinNote(note: Note) {
+        lifecycleScope.launch {
+            note.isPinned = !note.isPinned
+            repository.updateNote(note)
+
+            val message = if (note.isPinned) {
+                getString(R.string.note_pinned)
+            } else {
+                getString(R.string.note_unpinned)
+            }
+            Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
+
+            loadNotes()
+        }
+    }
+
+    private fun showDeleteConfirmation(note: Note) {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.delete)
+            .setMessage(R.string.delete_confirmation)
+            .setPositiveButton(R.string.yes) { _, _ ->
+                deleteNote(note)
+            }
+            .setNegativeButton(R.string.no, null)
+            .show()
+    }
+
+    private fun deleteNote(note: Note) {
+        lifecycleScope.launch {
+            repository.deleteNote(note)
+            Toast.makeText(this@MainActivity, R.string.note_deleted, Toast.LENGTH_SHORT).show()
+            loadNotes()
+        }
     }
 
     private fun setupSelectionToolbar() {

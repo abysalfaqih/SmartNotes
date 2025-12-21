@@ -24,142 +24,139 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:padding="32dp"
+            android:gravity="center_horizontal">
 
+            <!-- App Icon & Branding -->
             <ImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center_horizontal"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:src="@mipmap/ic_launcher"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="24dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/app_name"
-                android:textSize="24sp"
+                android:textSize="32sp"
                 android:textStyle="bold"
-                android:layout_gravity="center_horizontal"
-                android:textColor="@color/black" />
+                android:textColor="@color/black"
+                android:letterSpacing="0.02" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/about_tagline"
+                android:textSize="16sp"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/primary"
+                android:textStyle="normal"
+                android:letterSpacing="0.05" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/app_version"
                 android:textSize="14sp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="4dp"
-                android:textColor="@color/gray" />
+                android:layout_marginTop="12dp"
+                android:textColor="@color/gray"
+                android:alpha="0.7" />
 
+            <!-- Spacer -->
             <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/light_gray"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="24dp" />
+                android:layout_width="80dp"
+                android:layout_height="3dp"
+                android:background="@color/primary"
+                android:layout_marginTop="40dp"
+                android:layout_marginBottom="40dp"
+                android:alpha="0.3" />
 
+            <!-- Description -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/about_description"
                 android:textSize="16sp"
-                android:lineSpacingExtra="4dp"
-                android:textColor="@color/black" />
+                android:lineSpacingExtra="6dp"
+                android:textColor="@color/black"
+                android:gravity="center"
+                android:layout_marginBottom="48dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/light_gray"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="24dp" />
-
+            <!-- Vision Section -->
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/developer"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="@color/gray" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/developer_name"
-                android:textSize="16sp"
-                android:layout_marginTop="4dp"
-                android:textColor="@color/black" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/contact"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginTop="16dp"
-                android:textColor="@color/gray" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/email"
-                android:textSize="16sp"
-                android:layout_marginTop="4dp"
-                android:textColor="@color/primary"
-                android:autoLink="email" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/light_gray"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="24dp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/credits"
+                android:text="@string/vision_title"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="@color/black" />
+                android:textColor="@color/black"
+                android:layout_marginBottom="12dp" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/credits_description"
-                android:textSize="14sp"
-                android:layout_marginTop="8dp"
-                android:textColor="@color/gray" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/open_source_libraries"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginTop="16dp"
-                android:textColor="@color/gray" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="• Material Design Components\n• AndroidX Libraries\n• Kotlin Programming Language"
-                android:textSize="14sp"
-                android:layout_marginTop="8dp"
+                android:text="@string/vision_description"
+                android:textSize="15sp"
                 android:lineSpacingExtra="4dp"
-                android:textColor="@color/black" />
+                android:textColor="@color/gray"
+                android:gravity="center"
+                android:layout_marginBottom="48dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp" />
 
+            <!-- Developer -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/developer"
+                android:textSize="13sp"
+                android:textColor="@color/gray"
+                android:layout_marginBottom="8dp"
+                android:alpha="0.8" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/developer_name"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary"
+                android:layout_marginBottom="48dp"
+                android:letterSpacing="0.03" />
+
+            <!-- Copyright -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/copyright"
+                android:textSize="12sp"
+                android:textColor="@color/gray"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="32dp"
+                android:alpha="0.6" />
+
+            <!-- Close Button -->
             <Button
                 android:id="@+id/closeButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/close"
-                android:layout_marginTop="32dp" />
+                android:textSize="16sp"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp" />
 
         </LinearLayout>
 

@@ -19,6 +19,8 @@
     <!-- Messages -->
     <string name="note_saved">Catatan berhasil disimpan</string>
     <string name="note_deleted">Catatan berhasil dihapus</string>
+    <string name="note_pinned">Catatan telah di-pin</string>
+    <string name="note_unpinned">Catatan telah di-unpin</string>
     <string name="empty_title_error">Judul tidak boleh kosong</string>
     <string name="empty_content_error">Konten tidak boleh kosong</string>
     <string name="delete_confirmation">Hapus catatan ini?</string>
@@ -55,11 +57,13 @@
     <!-- About -->
     <string name="about_title">Tentang SmartNotes</string>
     <string name="app_version">Versi 1.0</string>
-    <string name="about_description">SmartNotes adalah aplikasi catatan sederhana dan mudah digunakan untuk membantu Anda mengorganisir pikiran dan ide.</string>
+    <string name="about_description">SmartNotes adalah aplikasi catatan pintar yang membantu Anda mengorganisir ide, tugas, dan informasi penting dengan cara yang sederhana dan efisien.</string>
+    <string name="about_tagline">Produktivitas dalam Genggaman</string>
     <string name="developer">Dikembangkan oleh</string>
-    <string name="developer_name">Your Name</string>
-    <string name="contact">Kontak</string>
-    <string name="email">email@example.com</string>
+    <string name="developer_name">Devnest</string>
+    <string name="vision_title">Visi Kami</string>
+    <string name="vision_description">Menciptakan pengalaman mencatat yang intuitif dan menyenangkan untuk setiap orang.</string>
+    <string name="copyright">© 2025 Devnest. All rights reserved.</string>
     <string name="close">Tutup</string>
 
     <!-- Categories -->
@@ -78,17 +82,11 @@
     <string name="note_color">Warna Catatan</string>
 
     <!-- Pin -->
-    <string name="pin">Pin</string>
-    <string name="unpin">Unpin</string>
+    <string name="pin">📌 Pin</string>
+    <string name="unpin">📌 Unpin</string>
     <string name="pinned_notes">Catatan Terpin</string>
 
     <!-- Share -->
     <string name="share">Bagikan</string>
     <string name="share_note">Bagikan Catatan</string>
-    <string name="credits">Kredit</string>
-    <string name="credits_description">Terima kasih kepada semua yang telah berkontribusi dalam pengembangan aplikasi ini.</string>
-    <string name="open_source_libraries">Library Open Source:</string>
-    <string name="material_design">Material Design Components</string>
-    <string name="androidx">AndroidX Libraries</string>
-    <string name="kotlin">Kotlin Programming Language</string>
 </resources>
