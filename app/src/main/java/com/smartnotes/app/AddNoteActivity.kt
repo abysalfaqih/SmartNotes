@@ -7,15 +7,16 @@ import android.text.SpannableStringBuilder
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.StyleSpan
 import android.view.View
-import android.widget.Button
 import android.widget.EditText
-import android.widget.HorizontalScrollView
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.card.MaterialCardView
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.smartnotes.app.data.Note
 import com.smartnotes.app.data.NoteDaoImpl
 import com.smartnotes.app.data.NoteRepository
@@ -26,12 +27,16 @@ class AddNoteActivity : AppCompatActivity() {
     private lateinit var repository: NoteRepository
     private lateinit var titleEditText: EditText
     private lateinit var contentEditText: RichEditText
-    private lateinit var saveButton: Button
-    private lateinit var deleteButton: Button
-    private lateinit var editButton: Button
-    private lateinit var formattingToolbar: HorizontalScrollView
+    private lateinit var saveButton: ExtendedFloatingActionButton
+    private lateinit var deleteButton: LinearLayout
+    private lateinit var editButton: LinearLayout
+    private lateinit var deleteButtonCard: MaterialCardView
+    private lateinit var editButtonCard: MaterialCardView
+    private lateinit var formattingToolbar: MaterialCardView
     private lateinit var categoryButton: TextView
     private lateinit var colorButton: TextView
+    private lateinit var categoryCard: MaterialCardView
+    private lateinit var colorCard: MaterialCardView
 
     private lateinit var btnCheckList: ImageButton
     private lateinit var btnH1: ImageButton
@@ -52,6 +57,7 @@ class AddNoteActivity : AppCompatActivity() {
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
         val noteDao = NoteDaoImpl(this)
         repository = NoteRepository(noteDao)
@@ -64,6 +70,9 @@ class AddNoteActivity : AppCompatActivity() {
         toolbar.setNavigationOnClickListener {
             finish()
         }
+
+        // Update background color
+        updateBackgroundColor()
     }
 
     private fun initializeViews() {
@@ -72,9 +81,13 @@ class AddNoteActivity : AppCompatActivity() {
         saveButton = findViewById(R.id.saveButton)
         deleteButton = findViewById(R.id.deleteButton)
         editButton = findViewById(R.id.editButton)
+        deleteButtonCard = findViewById(R.id.deleteButtonCard)
+        editButtonCard = findViewById(R.id.editButtonCard)
         formattingToolbar = findViewById(R.id.formattingToolbar)
         categoryButton = findViewById(R.id.categoryButton)
         colorButton = findViewById(R.id.colorButton)
+        categoryCard = findViewById(R.id.categoryCard)
+        colorCard = findViewById(R.id.colorCard)
 
         btnCheckList = findViewById(R.id.btnCheckList)
         btnH1 = findViewById(R.id.btnH1)
@@ -86,13 +99,27 @@ class AddNoteActivity : AppCompatActivity() {
         // Show toolbar when content EditText is focused
         contentEditText.setOnFocusChangeListener { _, hasFocus ->
             if (isEditMode) {
-                formattingToolbar.visibility = if (hasFocus) View.VISIBLE else View.GONE
+                if (hasFocus) {
+                    formattingToolbar.animate()
+                        .alpha(1f)
+                        .translationY(0f)
+                        .setDuration(300)
+                        .withStartAction { formattingToolbar.visibility = View.VISIBLE }
+                        .start()
+                } else {
+                    formattingToolbar.animate()
+                        .alpha(0f)
+                        .translationY(100f)
+                        .setDuration(300)
+                        .withEndAction { formattingToolbar.visibility = View.GONE }
+                        .start()
+                }
             }
         }
 
         // Setup category & color button listeners
-        categoryButton.setOnClickListener { showCategoryDialog() }
-        colorButton.setOnClickListener { showColorDialog() }
+        categoryCard.setOnClickListener { showCategoryDialog() }
+        colorCard.setOnClickListener { showColorDialog() }
     }
 
     private fun setupToolbarButtons() {
@@ -109,7 +136,12 @@ class AddNoteActivity : AppCompatActivity() {
         btnH3.setOnClickListener { applyHeading(3) }
         btnBold.setOnClickListener { contentEditText.applyBold() }
         btnClose.setOnClickListener {
-            formattingToolbar.visibility = View.GONE
+            formattingToolbar.animate()
+                .alpha(0f)
+                .translationY(100f)
+                .setDuration(300)
+                .withEndAction { formattingToolbar.visibility = View.GONE }
+                .start()
             contentEditText.clearFocus()
         }
     }
@@ -117,7 +149,6 @@ class AddNoteActivity : AppCompatActivity() {
     private fun loadExistingNote() {
         existingNote = intent.getParcelableExtra("note")
         existingNote?.let { note ->
-            supportActionBar?.title = note.title
             titleEditText.setText(note.title)
 
             val spannable = SpannableStringBuilder(note.content)
@@ -128,6 +159,7 @@ class AddNoteActivity : AppCompatActivity() {
 
             updateCategoryButton()
             updateColorButton()
+            updateBackgroundColor()
 
             // Set to view mode initially
             setViewMode()
@@ -136,8 +168,7 @@ class AddNoteActivity : AppCompatActivity() {
         // If creating new note, set to edit mode
         if (existingNote == null) {
             isEditMode = true
-            supportActionBar?.title = getString(R.string.add_note)
-            editButton.visibility = View.GONE
+            editButtonCard.visibility = View.GONE
         }
     }
 
@@ -151,9 +182,9 @@ class AddNoteActivity : AppCompatActivity() {
         contentEditText.setTextIsSelectable(false)
 
         formattingToolbar.visibility = View.GONE
-        saveButton.visibility = View.GONE
-        deleteButton.visibility = View.GONE
-        editButton.visibility = View.VISIBLE
+        saveButton.hide()
+        deleteButtonCard.visibility = View.VISIBLE
+        editButtonCard.visibility = View.VISIBLE
     }
 
     private fun setEditMode() {
@@ -165,9 +196,9 @@ class AddNoteActivity : AppCompatActivity() {
         titleEditText.setTextIsSelectable(true)
         contentEditText.setTextIsSelectable(true)
 
-        saveButton.visibility = View.VISIBLE
-        deleteButton.visibility = View.VISIBLE
-        editButton.visibility = View.GONE
+        saveButton.show()
+        deleteButtonCard.visibility = View.GONE
+        editButtonCard.visibility = View.GONE
 
         // Focus to content
         contentEditText.requestFocus()
@@ -226,10 +257,10 @@ class AddNoteActivity : AppCompatActivity() {
 
         // Apply new heading style with actual pixel size
         val textSizePx = when (level) {
-            1 -> (28 * resources.displayMetrics.scaledDensity).toInt() // H1: 28sp
-            2 -> (24 * resources.displayMetrics.scaledDensity).toInt() // H2: 24sp
-            3 -> (20 * resources.displayMetrics.scaledDensity).toInt() // H3: 20sp
-            else -> (16 * resources.displayMetrics.scaledDensity).toInt() // Normal: 16sp
+            1 -> (28 * resources.displayMetrics.scaledDensity).toInt()
+            2 -> (24 * resources.displayMetrics.scaledDensity).toInt()
+            3 -> (20 * resources.displayMetrics.scaledDensity).toInt()
+            else -> (16 * resources.displayMetrics.scaledDensity).toInt()
         }
 
         spannable.setSpan(
@@ -265,6 +296,20 @@ class AddNoteActivity : AppCompatActivity() {
             Toast.makeText(this, R.string.empty_content_error, Toast.LENGTH_SHORT).show()
             return
         }
+
+        // Animate save button
+        saveButton.animate()
+            .scaleX(0.9f)
+            .scaleY(0.9f)
+            .setDuration(100)
+            .withEndAction {
+                saveButton.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(100)
+                    .start()
+            }
+            .start()
 
         lifecycleScope.launch {
             if (existingNote != null) {
@@ -336,15 +381,15 @@ class AddNoteActivity : AppCompatActivity() {
         if (!isEditMode) return
 
         val colors = arrayOf(
-            "Putih" to "#FFFFFF",
-            "Merah" to "#FFCDD2",
-            "Pink" to "#F8BBD0",
-            "Ungu" to "#E1BEE7",
-            "Biru" to "#BBDEFB",
-            "Cyan" to "#B2EBF2",
-            "Hijau" to "#C8E6C9",
-            "Kuning" to "#FFF9C4",
-            "Orange" to "#FFE0B2"
+            "Default" to "#FFFFFF",
+            "Merah" to "#FFE5E5",
+            "Pink" to "#FFE5F3",
+            "Ungu" to "#F3E8FF",
+            "Biru" to "#E0F2FE",
+            "Cyan" to "#CFFAFE",
+            "Hijau" to "#D1FAE5",
+            "Kuning" to "#FEF9C3",
+            "Orange" to "#FFEDD5"
         )
 
         val colorNames = colors.map { it.first }.toTypedArray()
@@ -361,29 +406,16 @@ class AddNoteActivity : AppCompatActivity() {
 
     private fun updateColorButton() {
         colorButton.text = "🎨 Warna"
-        try {
-            colorButton.setBackgroundColor(android.graphics.Color.parseColor(selectedColor))
-
-            // Change text color based on background brightness
-            val color = android.graphics.Color.parseColor(selectedColor)
-            val brightness = (android.graphics.Color.red(color) * 299 +
-                    android.graphics.Color.green(color) * 587 +
-                    android.graphics.Color.blue(color) * 114) / 1000
-
-            if (brightness > 128) {
-                colorButton.setTextColor(android.graphics.Color.BLACK)
-            } else {
-                colorButton.setTextColor(android.graphics.Color.WHITE)
-            }
-        } catch (e: Exception) {
-            colorButton.setBackgroundColor(android.graphics.Color.WHITE)
-            colorButton.setTextColor(android.graphics.Color.BLACK)
-        }
     }
 
     private fun updateBackgroundColor() {
         try {
-            window.decorView.setBackgroundColor(android.graphics.Color.parseColor(selectedColor))
+            val color = android.graphics.Color.parseColor(selectedColor)
+            window.decorView.setBackgroundColor(color)
+
+            // Update card backgrounds to match
+            findViewById<MaterialCardView>(R.id.categoryCard)?.setCardBackgroundColor(color)
+            findViewById<MaterialCardView>(R.id.colorCard)?.setCardBackgroundColor(color)
         } catch (e: Exception) {
             window.decorView.setBackgroundColor(android.graphics.Color.WHITE)
         }

@@ -15,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.smartnotes.app.data.Note
 import com.smartnotes.app.data.NoteDaoImpl
 import com.smartnotes.app.data.NoteRepository
@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var searchEditText: EditText
     private lateinit var toolbar: androidx.appcompat.widget.Toolbar
     private lateinit var selectionToolbar: androidx.appcompat.widget.Toolbar
-    private lateinit var fabAddNote: FloatingActionButton
+    private lateinit var fabAddNote: ExtendedFloatingActionButton
 
     private var allNotes: List<Note> = emptyList()
     private var currentSortMode = SortMode.DATE_NEWEST
@@ -73,6 +73,18 @@ class MainActivity : AppCompatActivity() {
         notesRecyclerView.layoutManager = LinearLayoutManager(this)
         notesRecyclerView.adapter = adapter
 
+        // Add scroll listener for FAB animation
+        notesRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy > 0 && fabAddNote.isExtended) {
+                    fabAddNote.shrink()
+                } else if (dy < 0 && !fabAddNote.isExtended) {
+                    fabAddNote.extend()
+                }
+            }
+        })
+
         fabAddNote.setOnClickListener {
             val intent = Intent(this, AddNoteActivity::class.java)
             startActivity(intent)
@@ -102,10 +114,10 @@ class MainActivity : AppCompatActivity() {
             .setTitle(note.title)
             .setItems(options) { _, which ->
                 when (which) {
-                    0 -> togglePinNote(note) // Pin/Unpin
-                    1 -> showCategoryDialog(note) // Change Category
-                    2 -> showColorDialog(note) // Change Color
-                    3 -> showDeleteConfirmation(note) // Delete
+                    0 -> togglePinNote(note)
+                    1 -> showCategoryDialog(note)
+                    2 -> showColorDialog(note)
+                    3 -> showDeleteConfirmation(note)
                 }
             }
             .setNegativeButton("Batal", null)
@@ -137,15 +149,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun showColorDialog(note: Note) {
         val colors = arrayOf(
-            "Putih" to "#FFFFFF",
-            "Merah" to "#FFCDD2",
-            "Pink" to "#F8BBD0",
-            "Ungu" to "#E1BEE7",
-            "Biru" to "#BBDEFB",
-            "Cyan" to "#B2EBF2",
-            "Hijau" to "#C8E6C9",
-            "Kuning" to "#FFF9C4",
-            "Orange" to "#FFE0B2"
+            "Default" to "#FFFFFF",
+            "Merah" to "#FFE5E5",
+            "Pink" to "#FFE5F3",
+            "Ungu" to "#F3E8FF",
+            "Biru" to "#E0F2FE",
+            "Cyan" to "#CFFAFE",
+            "Hijau" to "#D1FAE5",
+            "Kuning" to "#FEF9C3",
+            "Orange" to "#FFEDD5"
         )
 
         val colorNames = colors.map { it.first }.toTypedArray()
@@ -335,11 +347,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
-
-        // Make sure menu items are visible
         menu?.findItem(R.id.action_sort)?.isVisible = true
         menu?.findItem(R.id.action_about)?.isVisible = true
-
         return true
     }
 

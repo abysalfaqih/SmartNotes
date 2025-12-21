@@ -28,6 +28,7 @@ class NoteAdapter(
 
     class NoteViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val cardView: com.google.android.material.card.MaterialCardView = view.findViewById(R.id.cardView)
+        val accentBar: View = view.findViewById(R.id.accentBar)
         val titleTextView: TextView = view.findViewById(R.id.titleTextView)
         val contentTextView: TextView = view.findViewById(R.id.contentTextView)
         val timestampTextView: TextView = view.findViewById(R.id.timestampTextView)
@@ -56,8 +57,14 @@ class NoteAdapter(
             holder.cardView.setCardBackgroundColor(android.graphics.Color.WHITE)
         }
 
-        // Show/hide pin icon
-        holder.pinIcon.visibility = if (note.isPinned) View.VISIBLE else View.GONE
+        // Show/hide pin icon and accent bar
+        if (note.isPinned) {
+            holder.pinIcon.visibility = View.VISIBLE
+            holder.accentBar.visibility = View.VISIBLE
+        } else {
+            holder.pinIcon.visibility = View.GONE
+            holder.accentBar.visibility = View.GONE
+        }
 
         holder.selectCheckbox.visibility = if (isSelectionMode) View.VISIBLE else View.GONE
         holder.selectCheckbox.isChecked = note.isSelected
@@ -75,7 +82,7 @@ class NoteAdapter(
             }
         }
 
-        // Long press handler
+        // Long press handler with modern animation
         var longPressHandler: android.os.Handler? = null
         var isLongPressTriggered = false
 
@@ -83,11 +90,11 @@ class NoteAdapter(
             when (event.action) {
                 android.view.MotionEvent.ACTION_DOWN -> {
                     isLongPressTriggered = false
-                    // Add visual feedback - scale down animation
+                    // Modern scale animation
                     v.animate()
-                        .scaleX(0.95f)
-                        .scaleY(0.95f)
-                        .setDuration(100)
+                        .scaleX(0.97f)
+                        .scaleY(0.97f)
+                        .setDuration(150)
                         .start()
 
                     longPressHandler = android.os.Handler(android.os.Looper.getMainLooper())
@@ -99,16 +106,16 @@ class NoteAdapter(
                         )
                         isLongPressTriggered = true
 
-                        // Call long click callback - show menu instead of selection mode
+                        // Call long click callback
                         onNoteLongClick(note)
 
-                        // Reset scale
+                        // Reset scale with bounce
                         v.animate()
                             .scaleX(1f)
                             .scaleY(1f)
-                            .setDuration(100)
+                            .setDuration(200)
                             .start()
-                    }, 500) // 500ms delay
+                    }, 500)
                     false
                 }
                 android.view.MotionEvent.ACTION_UP -> {
@@ -118,7 +125,7 @@ class NoteAdapter(
                     v.animate()
                         .scaleX(1f)
                         .scaleY(1f)
-                        .setDuration(100)
+                        .setDuration(150)
                         .start()
 
                     // If not long press, trigger normal click
@@ -135,7 +142,7 @@ class NoteAdapter(
                     v.animate()
                         .scaleX(1f)
                         .scaleY(1f)
-                        .setDuration(100)
+                        .setDuration(150)
                         .start()
                     false
                 }
@@ -144,7 +151,7 @@ class NoteAdapter(
         }
 
         holder.itemView.setOnLongClickListener {
-            true // Consume the event to prevent default behavior
+            true
         }
     }
 

@@ -6,101 +6,127 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="2dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="3dp"
     android:clickable="true"
     android:focusable="true"
+    android:stateListAnimator="@null"
     android:foreground="?android:attr/selectableItemBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp">
+        android:orientation="vertical">
 
-        <CheckBox
-            android:id="@+id/selectCheckbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+        <!-- Accent Bar (Optional - shows when pinned) -->
+        <View
+            android:id="@+id/accentBar"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:background="@color/primary"
             android:visibility="gone" />
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginStart="8dp">
+            android:orientation="horizontal"
+            android:padding="20dp">
+
+            <CheckBox
+                android:id="@+id/selectCheckbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="12dp"
+                android:visibility="gone"
+                android:buttonTint="@color/primary" />
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/pinIcon"
-                    android:layout_width="wrap_content"
+                <!-- Title Row with Pin Icon -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="📌"
-                    android:textSize="16sp"
-                    android:visibility="gone"
-                    android:layout_marginEnd="4dp"
-                    android:layout_marginTop="-2dp" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="8dp">
 
+                    <TextView
+                        android:id="@+id/pinIcon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📌"
+                        android:textSize="18sp"
+                        android:visibility="gone"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:id="@+id/titleTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Judul Catatan"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/text_primary"
+                        android:maxLines="2"
+                        android:ellipsize="end"
+                        android:lineSpacingExtra="2dp" />
+
+                </LinearLayout>
+
+                <!-- Content Preview -->
                 <TextView
-                    android:id="@+id/titleTextView"
-                    android:layout_width="0dp"
+                    android:id="@+id/contentTextView"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Judul Catatan"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/black"
-                    android:maxLines="1"
-                    android:ellipsize="end" />
+                    android:text="Isi catatan..."
+                    android:textSize="14sp"
+                    android:textColor="@color/text_secondary"
+                    android:maxLines="3"
+                    android:ellipsize="end"
+                    android:lineSpacingExtra="3dp"
+                    android:layout_marginBottom="12dp" />
 
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/contentTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Isi catatan..."
-                android:textSize="14sp"
-                android:textColor="@color/gray"
-                android:layout_marginTop="4dp"
-                android:maxLines="3"
-                android:ellipsize="end" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="8dp"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:id="@+id/categoryTextView"
-                    android:layout_width="wrap_content"
+                <!-- Meta Info Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Pribadi"
-                    android:textSize="11sp"
-                    android:textColor="@color/white"
-                    android:background="@color/accent"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:layout_marginEnd="8dp" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
-                <TextView
-                    android:id="@+id/timestampTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="12 Jan 2025"
-                    android:textSize="12sp"
-                    android:textColor="@color/gray" />
+                    <!-- Category Badge -->
+                    <TextView
+                        android:id="@+id/categoryTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Pribadi"
+                        android:textSize="11sp"
+                        android:textColor="@color/white"
+                        android:background="@drawable/category_badge_background"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_marginEnd="12dp" />
+
+                    <!-- Timestamp -->
+                    <TextView
+                        android:id="@+id/timestampTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="12 Jan 2025"
+                        android:textSize="12sp"
+                        android:textColor="@color/text_tertiary"
+                        android:fontFamily="sans-serif" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
