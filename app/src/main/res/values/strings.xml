@@ -1,0 +1,94 @@
+<resources>
+    <string name="app_name">SmartNotes</string>
+
+    <!-- Main Screen -->
+    <string name="my_notes">Catatan Saya</string>
+    <string name="search_notes">Cari catatan...</string>
+    <string name="no_notes_yet">Belum ada catatan</string>
+    <string name="tap_plus_to_add">Tekan tombol + untuk menambah catatan baru</string>
+
+    <!-- Add/Edit Note -->
+    <string name="add_note">Tambah Catatan</string>
+    <string name="edit_note">Edit Catatan</string>
+    <string name="edit">Edit</string>
+    <string name="title_hint">Judul</string>
+    <string name="content_hint">Tulis catatan Anda di sini...</string>
+    <string name="save">Simpan</string>
+    <string name="delete">Hapus</string>
+
+    <!-- Messages -->
+    <string name="note_saved">Catatan berhasil disimpan</string>
+    <string name="note_deleted">Catatan berhasil dihapus</string>
+    <string name="empty_title_error">Judul tidak boleh kosong</string>
+    <string name="empty_content_error">Konten tidak boleh kosong</string>
+    <string name="delete_confirmation">Hapus catatan ini?</string>
+    <string name="yes">Ya</string>
+    <string name="no">Tidak</string>
+
+    <!-- Menu -->
+    <string name="about">Tentang</string>
+    <string name="settings">Pengaturan</string>
+    <string name="sort_by">Urutkan</string>
+    <string name="sort_by_date_newest">Tanggal (Terbaru)</string>
+    <string name="sort_by_date_oldest">Tanggal (Terlama)</string>
+    <string name="sort_by_title_az">Judul (A-Z)</string>
+    <string name="sort_by_title_za">Judul (Z-A)</string>
+    <string name="delete_selected">Hapus Dipilih</string>
+    <string name="select_all">Pilih Semua</string>
+    <string name="deselect_all">Batal Pilih</string>
+    <string name="selected_count">%d dipilih</string>
+    <string name="delete_selected_confirmation">Hapus %d catatan yang dipilih?</string>
+    <string name="notes_deleted">%d catatan berhasil dihapus</string>
+
+    <!-- Rich Text Editor -->
+    <string name="bold">Tebal</string>
+    <string name="italic">Miring</string>
+    <string name="underline">Garis Bawah</string>
+    <string name="strikethrough">Coret</string>
+    <string name="bullet_list">Daftar Poin</string>
+    <string name="checklist">Checklist</string>
+    <string name="heading_1">Heading 1</string>
+    <string name="heading_2">Heading 2</string>
+    <string name="heading_3">Heading 3</string>
+    <string name="close_toolbar">Tutup Toolbar</string>
+
+    <!-- About -->
+    <string name="about_title">Tentang SmartNotes</string>
+    <string name="app_version">Versi 1.0</string>
+    <string name="about_description">SmartNotes adalah aplikasi catatan sederhana dan mudah digunakan untuk membantu Anda mengorganisir pikiran dan ide.</string>
+    <string name="developer">Dikembangkan oleh</string>
+    <string name="developer_name">Your Name</string>
+    <string name="contact">Kontak</string>
+    <string name="email">email@example.com</string>
+    <string name="close">Tutup</string>
+
+    <!-- Categories -->
+    <string name="category">Kategori</string>
+    <string name="all_categories">Semua</string>
+    <string name="work">Pekerjaan</string>
+    <string name="personal">Pribadi</string>
+    <string name="shopping">Belanja</string>
+    <string name="ideas">Ide</string>
+    <string name="add_category">Tambah Kategori</string>
+    <string name="category_name">Nama Kategori</string>
+    <string name="select_category">Pilih Kategori</string>
+
+    <!-- Colors -->
+    <string name="select_color">Pilih Warna</string>
+    <string name="note_color">Warna Catatan</string>
+
+    <!-- Pin -->
+    <string name="pin">Pin</string>
+    <string name="unpin">Unpin</string>
+    <string name="pinned_notes">Catatan Terpin</string>
+
+    <!-- Share -->
+    <string name="share">Bagikan</string>
+    <string name="share_note">Bagikan Catatan</string>
+    <string name="credits">Kredit</string>
+    <string name="credits_description">Terima kasih kepada semua yang telah berkontribusi dalam pengembangan aplikasi ini.</string>
+    <string name="open_source_libraries">Library Open Source:</string>
+    <string name="material_design">Material Design Components</string>
+    <string name="androidx">AndroidX Libraries</string>
+    <string name="kotlin">Kotlin Programming Language</string>
+</resources>
