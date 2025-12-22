@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Delete Option - hanya muncul di View Mode -->
+    <item
+        android:id="@+id/action_delete"
+        android:title="Hapus"
+        android:icon="@android:drawable/ic_menu_delete"
+        app:showAsAction="never"
+        android:orderInCategory="1" />
+
+    <!-- Share Option -->
+    <item
+        android:id="@+id/action_share"
+        android:title="Bagikan"
+        android:icon="@android:drawable/ic_menu_share"
+        app:showAsAction="never"
+        android:orderInCategory="2" />
+
+    <!-- Pin/Unpin Option -->
+    <item
+        android:id="@+id/action_pin"
+        android:title="Pin"
+        android:icon="@android:drawable/ic_menu_add"
+        app:showAsAction="never"
+        android:orderInCategory="3" />
+
+    <!-- Change Category -->
+    <item
+        android:id="@+id/action_category"
+        android:title="Ubah Kategori"
+        android:icon="@android:drawable/ic_menu_manage"
+        app:showAsAction="never"
+        android:orderInCategory="4" />
+
+    <!-- Change Color -->
+    <item
+        android:id="@+id/action_color"
+        android:title="Ubah Warna"
+        android:icon="@android:drawable/ic_menu_view"
+        app:showAsAction="never"
+        android:orderInCategory="5" />
+
+</menu>

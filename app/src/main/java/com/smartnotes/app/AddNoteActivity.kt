@@ -1,11 +1,14 @@
 package com.smartnotes.app
 
+import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.StyleSpan
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -25,7 +28,6 @@ class AddNoteActivity : AppCompatActivity() {
     private lateinit var titleEditText: EditText
     private lateinit var contentEditText: RichEditText
     private lateinit var saveButton: MaterialButton
-    private lateinit var deleteButton: MaterialButton
     private lateinit var editButton: MaterialButton
     private lateinit var formattingToolbar: LinearLayout
 
@@ -82,7 +84,6 @@ class AddNoteActivity : AppCompatActivity() {
             titleEditText = findViewById(R.id.titleEditText)
             contentEditText = findViewById(R.id.contentEditText)
             saveButton = findViewById(R.id.saveButton)
-            deleteButton = findViewById(R.id.deleteButton)
             editButton = findViewById(R.id.editButton)
             formattingToolbar = findViewById(R.id.formattingToolbar)
 
@@ -186,10 +187,9 @@ class AddNoteActivity : AppCompatActivity() {
             }
 
             if (existingNote == null) {
-                // New note
+                // New note - langsung edit mode
                 isEditMode = true
                 editButton.visibility = View.GONE
-                deleteButton.visibility = View.GONE
                 saveButton.visibility = View.VISIBLE
                 hasUnsavedChanges = false
 
@@ -207,6 +207,7 @@ class AddNoteActivity : AppCompatActivity() {
             isEditMode = false
             hasUnsavedChanges = false
 
+            // Disable editing
             titleEditText.isFocusable = false
             titleEditText.isFocusableInTouchMode = false
             contentEditText.isFocusable = false
@@ -214,10 +215,13 @@ class AddNoteActivity : AppCompatActivity() {
             titleEditText.setTextIsSelectable(true)
             contentEditText.setTextIsSelectable(true)
 
+            // Update buttons - Edit button muncul di pojok kanan atas
             formattingToolbar.visibility = View.GONE
             saveButton.visibility = View.GONE
-            deleteButton.visibility = View.VISIBLE
             editButton.visibility = View.VISIBLE
+
+            // Invalidate menu untuk menampilkan options (termasuk Hapus)
+            invalidateOptionsMenu()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -227,6 +231,7 @@ class AddNoteActivity : AppCompatActivity() {
         try {
             isEditMode = true
 
+            // Enable editing
             titleEditText.isFocusable = true
             titleEditText.isFocusableInTouchMode = true
             contentEditText.isFocusable = true
@@ -234,9 +239,12 @@ class AddNoteActivity : AppCompatActivity() {
             titleEditText.setTextIsSelectable(true)
             contentEditText.setTextIsSelectable(true)
 
+            // Update buttons - Save button muncul di pojok kanan atas
             saveButton.visibility = View.VISIBLE
-            deleteButton.visibility = View.GONE
             editButton.visibility = View.GONE
+
+            // Hide menu options saat edit mode
+            invalidateOptionsMenu()
 
             // Show keyboard
             contentEditText.requestFocus()
@@ -249,9 +257,48 @@ class AddNoteActivity : AppCompatActivity() {
         try {
             saveButton.setOnClickListener { saveNote() }
             editButton.setOnClickListener { setEditMode() }
-            deleteButton.setOnClickListener { showDeleteConfirmation() }
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+    }
+
+    // Options Menu - untuk Hapus dan opsi lainnya
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        // Hanya tampilkan menu saat View Mode
+        if (!isEditMode && existingNote != null) {
+            menuInflater.inflate(R.menu.note_detail_menu, menu)
+
+            // Update pin/unpin text
+            existingNote?.let { note ->
+                menu?.findItem(R.id.action_pin)?.title = if (note.isPinned) "Unpin" else "Pin"
+            }
+        }
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_delete -> {
+                showDeleteConfirmation()
+                true
+            }
+            R.id.action_share -> {
+                shareNote()
+                true
+            }
+            R.id.action_pin -> {
+                togglePin()
+                true
+            }
+            R.id.action_category -> {
+                showCategoryDialog()
+                true
+            }
+            R.id.action_color -> {
+                showColorDialog()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
@@ -395,6 +442,7 @@ class AddNoteActivity : AppCompatActivity() {
                         originalContent = content
                         hasUnsavedChanges = false
 
+                        Toast.makeText(this@AddNoteActivity, "Catatan disimpan", Toast.LENGTH_SHORT).show()
                         setViewMode()
                     } else {
                         val note = Note(
@@ -404,6 +452,7 @@ class AddNoteActivity : AppCompatActivity() {
                             color = selectedColor
                         )
                         repository.insertNote(note)
+                        Toast.makeText(this@AddNoteActivity, "Catatan dibuat", Toast.LENGTH_SHORT).show()
                         finish()
                     }
                 } catch (e: Exception) {
@@ -420,31 +469,130 @@ class AddNoteActivity : AppCompatActivity() {
     private fun showDeleteConfirmation() {
         try {
             AlertDialog.Builder(this)
-                .setTitle(R.string.delete)
-                .setMessage(R.string.delete_confirmation)
-                .setPositiveButton(R.string.yes) { _, _ ->
-                    deleteNote()
+                .setTitle("Pindahkan ke Sampah")
+                .setMessage("Pindahkan catatan ini ke sampah?")
+                .setPositiveButton("Ya") { _, _ ->
+                    moveToTrash()
                 }
-                .setNegativeButton(R.string.no, null)
+                .setNegativeButton("Batal", null)
                 .show()
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    private fun deleteNote() {
+    private fun moveToTrash() {
         try {
             existingNote?.let { note ->
                 lifecycleScope.launch {
                     try {
-                        repository.deleteNote(note)
+                        repository.moveToTrash(note)
+                        Toast.makeText(this@AddNoteActivity, "Dipindahkan ke sampah", Toast.LENGTH_SHORT).show()
                         finish()
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        Toast.makeText(this@AddNoteActivity, "Error deleting: ${e.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@AddNoteActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun shareNote() {
+        try {
+            existingNote?.let { note ->
+                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_SUBJECT, note.title)
+                    putExtra(Intent.EXTRA_TEXT, "${note.title}\n\n${note.content}")
+                }
+                startActivity(Intent.createChooser(shareIntent, "Bagikan Catatan"))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Error berbagi: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun togglePin() {
+        try {
+            existingNote?.let { note ->
+                lifecycleScope.launch {
+                    note.isPinned = !note.isPinned
+                    repository.updateNote(note)
+                    val message = if (note.isPinned) "Catatan di-pin" else "Catatan di-unpin"
+                    Toast.makeText(this@AddNoteActivity, message, Toast.LENGTH_SHORT).show()
+                    invalidateOptionsMenu()
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun showCategoryDialog() {
+        try {
+            val categories = arrayOf("Semua", "Pekerjaan", "Pribadi", "Belanja", "Ide", "Lainnya")
+            val currentIndex = categories.indexOf(selectedCategory).takeIf { it >= 0 } ?: 0
+
+            AlertDialog.Builder(this)
+                .setTitle("Pilih Kategori")
+                .setSingleChoiceItems(categories, currentIndex) { dialog, which ->
+                    selectedCategory = categories[which]
+                    existingNote?.let { note ->
+                        lifecycleScope.launch {
+                            note.category = selectedCategory
+                            repository.updateNote(note)
+                            Toast.makeText(this@AddNoteActivity, "Kategori diubah", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    dialog.dismiss()
+                }
+                .setNegativeButton("Batal", null)
+                .show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun showColorDialog() {
+        try {
+            val colors = arrayOf(
+                "Default" to "#FFFFFF",
+                "Merah" to "#F28B82",
+                "Orange" to "#FBBC04",
+                "Kuning" to "#FFF475",
+                "Hijau" to "#CCFF90",
+                "Teal" to "#A7FFEB",
+                "Biru" to "#CBF0F8",
+                "Biru Tua" to "#AECBFA",
+                "Ungu" to "#D7AEFB",
+                "Pink" to "#FDCFE8",
+                "Coklat" to "#E6C9A8",
+                "Abu-abu" to "#E8EAED"
+            )
+
+            val colorNames = colors.map { it.first }.toTypedArray()
+            val currentIndex = colors.indexOfFirst { it.second == selectedColor }.takeIf { it >= 0 } ?: 0
+
+            AlertDialog.Builder(this)
+                .setTitle("Pilih Warna")
+                .setSingleChoiceItems(colorNames, currentIndex) { dialog, which ->
+                    selectedColor = colors[which].second
+                    updateBackgroundColor()
+                    existingNote?.let { note ->
+                        lifecycleScope.launch {
+                            note.color = selectedColor
+                            repository.updateNote(note)
+                            Toast.makeText(this@AddNoteActivity, "Warna diubah", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    dialog.dismiss()
+                }
+                .setNegativeButton("Batal", null)
+                .show()
         } catch (e: Exception) {
             e.printStackTrace()
         }
