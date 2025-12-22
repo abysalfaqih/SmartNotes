@@ -164,23 +164,21 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Modern FAB - Google Keep Style -->
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+    <!-- Simple FAB - Right Bottom -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddNote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
-        android:text="Buat Catatan"
-        android:textSize="14sp"
-        android:textColor="@color/white"
-        android:fontFamily="sans-serif-medium"
-        app:icon="@android:drawable/ic_input_add"
-        app:iconTint="@color/white"
         android:contentDescription="@string/add_note"
+        app:srcCompat="@android:drawable/ic_input_add"
         app:backgroundTint="@color/primary"
+        app:tint="@color/white"
         app:elevation="6dp"
+        app:pressedTranslationZ="12dp"
         app:rippleColor="@color/primary_light"
-        style="@style/Widget.App.ExtendedFloatingActionButton" />
+        app:borderWidth="0dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -125,9 +125,6 @@ class AddNoteActivity : AppCompatActivity() {
                 if (start >= 0 && end > start) {
                     contentEditText.applyBold()
                     hasUnsavedChanges = true
-                    Toast.makeText(this, "Bold diterapkan", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "Pilih teks terlebih dahulu", Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -291,8 +288,6 @@ class AddNoteActivity : AppCompatActivity() {
             }
             contentEditText.setSelection(newPosition)
             hasUnsavedChanges = true
-
-            Toast.makeText(this, "Checkbox ditambahkan", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -305,13 +300,11 @@ class AddNoteActivity : AppCompatActivity() {
             val end = contentEditText.selectionEnd
 
             if (start < 0 || end <= start) {
-                Toast.makeText(this, "Pilih teks terlebih dahulu", Toast.LENGTH_SHORT).show()
                 return
             }
 
             val currentText = contentEditText.text
             if (currentText == null) {
-                Toast.makeText(this, "Tidak ada teks", Toast.LENGTH_SHORT).show()
                 return
             }
 
@@ -352,8 +345,6 @@ class AddNoteActivity : AppCompatActivity() {
             contentEditText.setText(spannable)
             contentEditText.setSelection(start, end)
             hasUnsavedChanges = true
-
-            Toast.makeText(this, "Heading $level diterapkan", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(this, "Error applying heading: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -400,8 +391,6 @@ class AddNoteActivity : AppCompatActivity() {
                         existingNote!!.color = selectedColor
                         repository.updateNote(existingNote!!)
 
-                        Toast.makeText(this@AddNoteActivity, R.string.note_saved, Toast.LENGTH_SHORT).show()
-
                         originalTitle = title
                         originalContent = content
                         hasUnsavedChanges = false
@@ -415,8 +404,6 @@ class AddNoteActivity : AppCompatActivity() {
                             color = selectedColor
                         )
                         repository.insertNote(note)
-
-                        Toast.makeText(this@AddNoteActivity, R.string.note_saved, Toast.LENGTH_SHORT).show()
                         finish()
                     }
                 } catch (e: Exception) {
@@ -451,7 +438,6 @@ class AddNoteActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     try {
                         repository.deleteNote(note)
-                        Toast.makeText(this@AddNoteActivity, R.string.note_deleted, Toast.LENGTH_SHORT).show()
                         finish()
                     } catch (e: Exception) {
                         e.printStackTrace()

@@ -17,7 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.smartnotes.app.data.Note
 import com.smartnotes.app.data.NoteDaoImpl
 import com.smartnotes.app.data.NoteRepository
@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var searchEditText: EditText
     private lateinit var toolbar: androidx.appcompat.widget.Toolbar
     private lateinit var selectionToolbar: androidx.appcompat.widget.Toolbar
-    private lateinit var fabAddNote: ExtendedFloatingActionButton
+    private lateinit var fabAddNote: FloatingActionButton
     private lateinit var prefs: SharedPreferences
 
     private var allNotes: List<Note> = emptyList()
@@ -81,10 +81,10 @@ class MainActivity : AppCompatActivity() {
         notesRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                if (dy > 0 && fabAddNote.isExtended) {
-                    fabAddNote.shrink()
-                } else if (dy < 0 && !fabAddNote.isExtended) {
-                    fabAddNote.extend()
+                if (dy > 0 && fabAddNote.isShown) {
+                    fabAddNote.hide()
+                } else if (dy < 0 && !fabAddNote.isShown) {
+                    fabAddNote.show()
                 }
             }
         })
@@ -130,10 +130,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         notesRecyclerView.adapter = adapter
-
-        val message = if (isGridView) "Tampilan Grid" else "Tampilan List"
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-
         invalidateOptionsMenu()
     }
 
@@ -143,7 +139,7 @@ class MainActivity : AppCompatActivity() {
             pinOption,
             "📁 Ubah Kategori",
             "🎨 Ubah Warna",
-            "🗑️ Pindahkan ke Sampah"  // CHANGED: From delete to move to trash
+            "🗑️ Pindahkan ke Sampah"
         )
 
         AlertDialog.Builder(this)
@@ -153,7 +149,7 @@ class MainActivity : AppCompatActivity() {
                     0 -> togglePinNote(note)
                     1 -> showCategoryDialog(note)
                     2 -> showColorDialog(note)
-                    3 -> showMoveToTrashConfirmation(note)  // CHANGED
+                    3 -> showMoveToTrashConfirmation(note)
                 }
             }
             .setNegativeButton("Batal", null)
@@ -170,11 +166,6 @@ class MainActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     note.category = categories[which]
                     repository.updateNote(note)
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Kategori diubah ke ${categories[which]}",
-                        Toast.LENGTH_SHORT
-                    ).show()
                     loadNotes()
                     dialog.dismiss()
                 }
@@ -208,11 +199,6 @@ class MainActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     note.color = colors[which].second
                     repository.updateNote(note)
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Warna diubah ke ${colors[which].first}",
-                        Toast.LENGTH_SHORT
-                    ).show()
                     loadNotes()
                     dialog.dismiss()
                 }
@@ -225,19 +211,10 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             note.isPinned = !note.isPinned
             repository.updateNote(note)
-
-            val message = if (note.isPinned) {
-                getString(R.string.note_pinned)
-            } else {
-                getString(R.string.note_unpinned)
-            }
-            Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
-
             loadNotes()
         }
     }
 
-    // NEW: Move to trash instead of permanent delete
     private fun showMoveToTrashConfirmation(note: Note) {
         AlertDialog.Builder(this)
             .setTitle("Pindahkan ke Sampah")
@@ -249,15 +226,9 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    // NEW: Move note to trash
     private fun moveToTrash(note: Note) {
         lifecycleScope.launch {
             repository.moveToTrash(note)
-            Toast.makeText(
-                this@MainActivity,
-                "\"${note.title}\" dipindahkan ke sampah",
-                Toast.LENGTH_SHORT
-            ).show()
             loadNotes()
         }
     }
@@ -366,8 +337,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         AlertDialog.Builder(this)
-            .setTitle("Pindahkan ke Sampah")  // CHANGED
-            .setMessage("Pindahkan ${selectedNotes.size} catatan ke sampah?")  // CHANGED
+            .setTitle("Pindahkan ke Sampah")
+            .setMessage("Pindahkan ${selectedNotes.size} catatan ke sampah?")
             .setPositiveButton("Ya") { _, _ ->
                 deleteSelectedNotes(selectedNotes)
             }
@@ -378,13 +349,8 @@ class MainActivity : AppCompatActivity() {
     private fun deleteSelectedNotes(notes: List<Note>) {
         lifecycleScope.launch {
             notes.forEach { note ->
-                repository.moveToTrash(note)  // CHANGED: Use moveToTrash instead of delete
+                repository.moveToTrash(note)
             }
-            Toast.makeText(
-                this@MainActivity,
-                "${notes.size} catatan dipindahkan ke sampah",  // CHANGED
-                Toast.LENGTH_SHORT
-            ).show()
             exitSelectionMode()
             loadNotes()
         }
@@ -410,28 +376,23 @@ class MainActivity : AppCompatActivity() {
             R.id.sort_date_newest -> {
                 currentSortMode = SortMode.DATE_NEWEST
                 sortAndDisplayNotes()
-                Toast.makeText(this, "Diurutkan: Terbaru", Toast.LENGTH_SHORT).show()
                 true
             }
             R.id.sort_date_oldest -> {
                 currentSortMode = SortMode.DATE_OLDEST
                 sortAndDisplayNotes()
-                Toast.makeText(this, "Diurutkan: Terlama", Toast.LENGTH_SHORT).show()
                 true
             }
             R.id.sort_title_az -> {
                 currentSortMode = SortMode.TITLE_AZ
                 sortAndDisplayNotes()
-                Toast.makeText(this, "Diurutkan: A-Z", Toast.LENGTH_SHORT).show()
                 true
             }
             R.id.sort_title_za -> {
                 currentSortMode = SortMode.TITLE_ZA
                 sortAndDisplayNotes()
-                Toast.makeText(this, "Diurutkan: Z-A", Toast.LENGTH_SHORT).show()
                 true
             }
-            // NEW: Trash menu
             R.id.action_trash -> {
                 startActivity(Intent(this, TrashActivity::class.java))
                 true

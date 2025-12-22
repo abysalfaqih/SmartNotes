@@ -95,11 +95,6 @@ class TrashActivity : AppCompatActivity() {
     private fun restoreNote(note: Note) {
         lifecycleScope.launch {
             repository.restoreFromTrash(note)
-            Toast.makeText(
-                this@TrashActivity,
-                "\"${note.title}\" dipulihkan",
-                Toast.LENGTH_SHORT
-            ).show()
             loadTrashedNotes()
         }
     }
@@ -118,11 +113,6 @@ class TrashActivity : AppCompatActivity() {
     private fun permanentlyDeleteNote(note: Note) {
         lifecycleScope.launch {
             repository.permanentlyDelete(note)
-            Toast.makeText(
-                this@TrashActivity,
-                "\"${note.title}\" dihapus permanen",
-                Toast.LENGTH_SHORT
-            ).show()
             loadTrashedNotes()
         }
     }
@@ -149,11 +139,6 @@ class TrashActivity : AppCompatActivity() {
     private fun emptyTrash() {
         lifecycleScope.launch {
             repository.emptyTrash()
-            Toast.makeText(
-                this@TrashActivity,
-                "Sampah dikosongkan",
-                Toast.LENGTH_SHORT
-            ).show()
             loadTrashedNotes()
         }
     }
