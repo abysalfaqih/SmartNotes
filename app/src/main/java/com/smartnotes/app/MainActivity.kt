@@ -103,6 +103,11 @@ class MainActivity : AppCompatActivity() {
         })
 
         setupSelectionToolbar()
+
+        // Auto-cleanup expired trash notes on app start
+        lifecycleScope.launch {
+            repository.deleteExpiredNotes()
+        }
     }
 
     private fun setupRecyclerView() {
@@ -138,7 +143,7 @@ class MainActivity : AppCompatActivity() {
             pinOption,
             "📁 Ubah Kategori",
             "🎨 Ubah Warna",
-            "🗑️ Hapus"
+            "🗑️ Pindahkan ke Sampah"  // CHANGED: From delete to move to trash
         )
 
         AlertDialog.Builder(this)
@@ -148,7 +153,7 @@ class MainActivity : AppCompatActivity() {
                     0 -> togglePinNote(note)
                     1 -> showCategoryDialog(note)
                     2 -> showColorDialog(note)
-                    3 -> showDeleteConfirmation(note)
+                    3 -> showMoveToTrashConfirmation(note)  // CHANGED
                 }
             }
             .setNegativeButton("Batal", null)
@@ -232,21 +237,27 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showDeleteConfirmation(note: Note) {
+    // NEW: Move to trash instead of permanent delete
+    private fun showMoveToTrashConfirmation(note: Note) {
         AlertDialog.Builder(this)
-            .setTitle(R.string.delete)
-            .setMessage(R.string.delete_confirmation)
-            .setPositiveButton(R.string.yes) { _, _ ->
-                deleteNote(note)
+            .setTitle("Pindahkan ke Sampah")
+            .setMessage("Pindahkan \"${note.title}\" ke sampah?")
+            .setPositiveButton("Ya") { _, _ ->
+                moveToTrash(note)
             }
-            .setNegativeButton(R.string.no, null)
+            .setNegativeButton("Batal", null)
             .show()
     }
 
-    private fun deleteNote(note: Note) {
+    // NEW: Move note to trash
+    private fun moveToTrash(note: Note) {
         lifecycleScope.launch {
-            repository.deleteNote(note)
-            Toast.makeText(this@MainActivity, R.string.note_deleted, Toast.LENGTH_SHORT).show()
+            repository.moveToTrash(note)
+            Toast.makeText(
+                this@MainActivity,
+                "\"${note.title}\" dipindahkan ke sampah",
+                Toast.LENGTH_SHORT
+            ).show()
             loadNotes()
         }
     }
@@ -355,23 +366,23 @@ class MainActivity : AppCompatActivity() {
         }
 
         AlertDialog.Builder(this)
-            .setTitle(R.string.delete_selected)
-            .setMessage(getString(R.string.delete_selected_confirmation, selectedNotes.size))
-            .setPositiveButton(R.string.yes) { _, _ ->
+            .setTitle("Pindahkan ke Sampah")  // CHANGED
+            .setMessage("Pindahkan ${selectedNotes.size} catatan ke sampah?")  // CHANGED
+            .setPositiveButton("Ya") { _, _ ->
                 deleteSelectedNotes(selectedNotes)
             }
-            .setNegativeButton(R.string.no, null)
+            .setNegativeButton("Batal", null)
             .show()
     }
 
     private fun deleteSelectedNotes(notes: List<Note>) {
         lifecycleScope.launch {
             notes.forEach { note ->
-                repository.deleteNote(note)
+                repository.moveToTrash(note)  // CHANGED: Use moveToTrash instead of delete
             }
             Toast.makeText(
                 this@MainActivity,
-                getString(R.string.notes_deleted, notes.size),
+                "${notes.size} catatan dipindahkan ke sampah",  // CHANGED
                 Toast.LENGTH_SHORT
             ).show()
             exitSelectionMode()
@@ -418,6 +429,11 @@ class MainActivity : AppCompatActivity() {
                 currentSortMode = SortMode.TITLE_ZA
                 sortAndDisplayNotes()
                 Toast.makeText(this, "Diurutkan: Z-A", Toast.LENGTH_SHORT).show()
+                true
+            }
+            // NEW: Trash menu
+            R.id.action_trash -> {
+                startActivity(Intent(this, TrashActivity::class.java))
                 true
             }
             R.id.action_about -> {

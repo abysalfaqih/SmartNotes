@@ -9,4 +9,12 @@ interface NoteDao {
     suspend fun searchNotes(query: String): List<Note>
     suspend fun getNotesByCategory(category: String): List<Note>
     suspend fun getAllCategories(): List<String>
+
+    // NEW: Trash/Recycle Bin methods
+    suspend fun moveToTrash(note: Note)
+    suspend fun restoreFromTrash(note: Note)
+    suspend fun getAllTrashedNotes(): List<Note>
+    suspend fun permanentlyDelete(note: Note)
+    suspend fun emptyTrash()
+    suspend fun deleteExpiredNotes()
 }

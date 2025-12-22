@@ -49,6 +49,14 @@
         </menu>
     </item>
 
+    <!-- NEW: Trash Menu Item -->
+    <item
+        android:id="@+id/action_trash"
+        android:title="@string/trash"
+        android:icon="@android:drawable/ic_menu_delete"
+        app:showAsAction="never"
+        android:orderInCategory="50" />
+
     <!-- About -->
     <item
         android:id="@+id/action_about"

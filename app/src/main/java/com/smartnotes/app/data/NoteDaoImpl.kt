@@ -20,6 +20,7 @@ class NoteDaoImpl(context: Context) : NoteDao {
         val newId = getNextId()
         note.id = newId
         note.timestamp = System.currentTimeMillis()
+        note.isDeleted = false
         notes.add(note)
         saveNotes(notes)
         return@withContext newId.toLong()
@@ -42,15 +43,15 @@ class NoteDaoImpl(context: Context) : NoteDao {
     }
 
     override suspend fun getAllNotes(): List<Note> = withContext(Dispatchers.IO) {
-        return@withContext getAllNotesSync()
+        return@withContext getAllNotesSync().filter { !it.isDeleted }
     }
 
     override suspend fun getNoteById(id: Int): Note? = withContext(Dispatchers.IO) {
-        return@withContext getAllNotesSync().find { it.id == id }
+        return@withContext getAllNotesSync().find { it.id == id && !it.isDeleted }
     }
 
     override suspend fun searchNotes(query: String): List<Note> = withContext(Dispatchers.IO) {
-        val allNotes = getAllNotesSync()
+        val allNotes = getAllNotesSync().filter { !it.isDeleted }
         return@withContext if (query.isBlank()) {
             allNotes
         } else {
@@ -62,7 +63,7 @@ class NoteDaoImpl(context: Context) : NoteDao {
     }
 
     override suspend fun getNotesByCategory(category: String): List<Note> = withContext(Dispatchers.IO) {
-        val allNotes = getAllNotesSync()
+        val allNotes = getAllNotesSync().filter { !it.isDeleted }
         return@withContext if (category == "Semua") {
             allNotes
         } else {
@@ -71,12 +72,57 @@ class NoteDaoImpl(context: Context) : NoteDao {
     }
 
     override suspend fun getAllCategories(): List<String> = withContext(Dispatchers.IO) {
-        val allNotes = getAllNotesSync()
+        val allNotes = getAllNotesSync().filter { !it.isDeleted }
         val categories = allNotes.map { it.category }.distinct().sorted().toMutableList()
         if (!categories.contains("Semua")) {
             categories.add(0, "Semua")
         }
         return@withContext categories
+    }
+
+    // NEW: Trash/Recycle Bin implementations
+    override suspend fun moveToTrash(note: Note) = withContext(Dispatchers.IO) {
+        val notes = getAllNotesSync().toMutableList()
+        val index = notes.indexOfFirst { it.id == note.id }
+        if (index != -1) {
+            notes[index].isDeleted = true
+            notes[index].deletedTimestamp = System.currentTimeMillis()
+            notes[index].isPinned = false // Unpin when moved to trash
+            saveNotes(notes)
+        }
+    }
+
+    override suspend fun restoreFromTrash(note: Note) = withContext(Dispatchers.IO) {
+        val notes = getAllNotesSync().toMutableList()
+        val index = notes.indexOfFirst { it.id == note.id }
+        if (index != -1) {
+            notes[index].isDeleted = false
+            notes[index].deletedTimestamp = 0L
+            notes[index].timestamp = System.currentTimeMillis()
+            saveNotes(notes)
+        }
+    }
+
+    override suspend fun getAllTrashedNotes(): List<Note> = withContext(Dispatchers.IO) {
+        return@withContext getAllNotesSync()
+            .filter { it.isDeleted }
+            .sortedByDescending { it.deletedTimestamp }
+    }
+
+    override suspend fun permanentlyDelete(note: Note) = withContext(Dispatchers.IO) {
+        delete(note)
+    }
+
+    override suspend fun emptyTrash() = withContext(Dispatchers.IO) {
+        val notes = getAllNotesSync().toMutableList()
+        notes.removeAll { it.isDeleted }
+        saveNotes(notes)
+    }
+
+    override suspend fun deleteExpiredNotes() = withContext(Dispatchers.IO) {
+        val notes = getAllNotesSync().toMutableList()
+        notes.removeAll { it.isExpired() }
+        saveNotes(notes)
     }
 
     private fun getAllNotesSync(): List<Note> {
@@ -95,13 +141,19 @@ class NoteDaoImpl(context: Context) : NoteDao {
                     isSelected = false,
                     category = jsonObject.optString("category", "Semua"),
                     color = jsonObject.optString("color", "#FFFFFF"),
-                    isPinned = jsonObject.optBoolean("isPinned", false)
+                    isPinned = jsonObject.optBoolean("isPinned", false),
+                    isDeleted = jsonObject.optBoolean("isDeleted", false),
+                    deletedTimestamp = jsonObject.optLong("deletedTimestamp", 0L),
+                    hasRichText = jsonObject.optBoolean("hasRichText", false)
                 )
             )
         }
 
-        // Sort: pinned first, then by timestamp
-        return notes.sortedWith(compareByDescending<Note> { it.isPinned }.thenByDescending { it.timestamp })
+        return notes.sortedWith(
+            compareByDescending<Note> { !it.isDeleted }
+                .thenByDescending { it.isPinned }
+                .thenByDescending { it.timestamp }
+        )
     }
 
     private fun saveNotes(notes: List<Note>) {
@@ -115,6 +167,9 @@ class NoteDaoImpl(context: Context) : NoteDao {
                 put("category", note.category)
                 put("color", note.color)
                 put("isPinned", note.isPinned)
+                put("isDeleted", note.isDeleted)
+                put("deletedTimestamp", note.deletedTimestamp)
+                put("hasRichText", note.hasRichText)
             }
             jsonArray.put(jsonObject)
         }

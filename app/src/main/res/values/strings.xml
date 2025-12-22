@@ -49,6 +49,21 @@
     <string name="grid_view">Tampilan Grid</string>
     <string name="list_view">Tampilan List</string>
 
+    <!-- NEW: Trash/Recycle Bin -->
+    <string name="trash">Sampah</string>
+    <string name="trash_empty">Sampah Kosong</string>
+    <string name="empty_trash">Kosongkan Sampah</string>
+    <string name="restore">Pulihkan</string>
+    <string name="permanent_delete">Hapus Permanen</string>
+    <string name="permanent_delete_confirmation">Hapus secara permanen?\n\nTindakan ini tidak dapat dibatalkan.</string>
+    <string name="empty_trash_confirmation">Hapus semua catatan di sampah secara permanen?\n\nTindakan ini tidak dapat dibatalkan.</string>
+    <string name="note_restored">Catatan dipulihkan</string>
+    <string name="note_permanently_deleted">Catatan dihapus permanen</string>
+    <string name="trash_emptied">Sampah dikosongkan</string>
+    <string name="days_until_delete">Dihapus permanen dalam %d hari</string>
+    <string name="trash_info">Sampah terhapus permanen setelah 30 hari</string>
+    <string name="move_to_trash">Pindahkan ke Sampah</string>
+
     <!-- Rich Text Editor -->
     <string name="bold">Tebal</string>
     <string name="italic">Miring</string>
@@ -61,6 +76,17 @@
     <string name="heading_3">Heading 3</string>
     <string name="close_toolbar">Tutup Toolbar</string>
     <string name="select_text_first">Pilih teks terlebih dahulu</string>
+
+    <!-- NEW: Rich Text Enhancement -->
+    <string name="text_color">Warna Teks</string>
+    <string name="highlight_color">Warna Highlight</string>
+    <string name="font_size">Ukuran Font</string>
+    <string name="insert_link">Sisipkan Link</string>
+    <string name="quote">Quote</string>
+    <string name="code_block">Code Block</string>
+    <string name="text_align_left">Rata Kiri</string>
+    <string name="text_align_center">Rata Tengah</string>
+    <string name="text_align_right">Rata Kanan</string>
 
     <!-- About -->
     <string name="about_title">Tentang SmartNotes</string>
