@@ -49,7 +49,6 @@ class AddNoteActivity : AppCompatActivity() {
     private var titleKeyListener: android.text.method.KeyListener? = null
     private var contentKeyListener: android.text.method.KeyListener? = null
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -84,10 +83,42 @@ class AddNoteActivity : AppCompatActivity() {
             }
 
             updateBackgroundColor()
+
+            // Entrance animation
+            animateEntrance()
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
             finish()
+        }
+    }
+
+    private fun animateEntrance() {
+        // Animate title and content with stagger
+        titleEditText.alpha = 0f
+        contentEditText.alpha = 0f
+
+        titleEditText.postDelayed({
+            AnimationUtils.fadeIn(titleEditText, duration = 400)
+        }, 100)
+
+        contentEditText.postDelayed({
+            AnimationUtils.slideUp(contentEditText, duration = 450)
+        }, 200)
+
+        // Animate buttons
+        if (existingNote != null) {
+            editButton.alpha = 0f
+            editButton.postDelayed({
+                AnimationUtils.bounce(editButton, duration = 400)
+                editButton.animate().alpha(1f).setDuration(300).start()
+            }, 300)
+        } else {
+            saveButton.alpha = 0f
+            saveButton.postDelayed({
+                AnimationUtils.bounce(saveButton, duration = 400)
+                saveButton.animate().alpha(1f).setDuration(300).start()
+            }, 300)
         }
     }
 
@@ -106,16 +137,15 @@ class AddNoteActivity : AppCompatActivity() {
             btnBold = findViewById(R.id.btnBold)
             btnClose = findViewById(R.id.btnClose)
 
-            // Show toolbar when content is focused
             contentEditText.setOnFocusChangeListener { _, hasFocus ->
                 if (isEditMode && hasFocus) {
-                    formattingToolbar.visibility = View.VISIBLE
+                    AnimationUtils.slideUp(formattingToolbar)
                 }
             }
 
             titleEditText.setOnFocusChangeListener { _, hasFocus ->
                 if (isEditMode && !hasFocus && contentEditText.hasFocus()) {
-                    formattingToolbar.visibility = View.VISIBLE
+                    AnimationUtils.slideUp(formattingToolbar)
                 }
             }
 
@@ -130,23 +160,54 @@ class AddNoteActivity : AppCompatActivity() {
 
     private fun setupToolbarButtons() {
         try {
-            btnCheckList.setOnClickListener { insertCheckbox() }
-            btnH1.setOnClickListener { applyHeading(1) }
-            btnH2.setOnClickListener { applyHeading(2) }
-            btnH3.setOnClickListener { applyHeading(3) }
+            // Add press animations to all toolbar buttons
+            val toolbarButtons = listOf(btnCheckList, btnH1, btnH2, btnH3, btnBold, btnClose)
+            toolbarButtons.forEach { button ->
+                button.setOnTouchListener { v, event ->
+                    when (event.action) {
+                        android.view.MotionEvent.ACTION_DOWN -> {
+                            AnimationUtils.pulse(v, scaleTo = 1.15f, duration = 100)
+                            false
+                        }
+                        else -> false
+                    }
+                }
+            }
+
+            btnCheckList.setOnClickListener {
+                AnimationUtils.pulse(it)
+                insertCheckbox()
+            }
+
+            btnH1.setOnClickListener {
+                AnimationUtils.pulse(it)
+                applyHeading(1)
+            }
+
+            btnH2.setOnClickListener {
+                AnimationUtils.pulse(it)
+                applyHeading(2)
+            }
+
+            btnH3.setOnClickListener {
+                AnimationUtils.pulse(it)
+                applyHeading(3)
+            }
 
             btnBold.setOnClickListener {
                 val start = contentEditText.selectionStart
                 val end = contentEditText.selectionEnd
 
                 if (start >= 0 && end > start) {
+                    AnimationUtils.pulse(it)
                     contentEditText.applyBold()
                     hasUnsavedChanges = true
                 }
             }
 
             btnClose.setOnClickListener {
-                formattingToolbar.visibility = View.GONE
+                AnimationUtils.pulse(it, scaleTo = 0.9f)
+                AnimationUtils.slideDown(formattingToolbar)
                 contentEditText.clearFocus()
             }
         } catch (e: Exception) {
@@ -203,13 +264,10 @@ class AddNoteActivity : AppCompatActivity() {
             }
 
             if (existingNote == null) {
-                // New note - langsung edit mode
                 isEditMode = true
                 editButton.visibility = View.GONE
                 saveButton.visibility = View.VISIBLE
                 hasUnsavedChanges = false
-
-                // Request focus to show keyboard
                 titleEditText.requestFocus()
             }
         } catch (e: Exception) {
@@ -223,7 +281,6 @@ class AddNoteActivity : AppCompatActivity() {
             isEditMode = false
             hasUnsavedChanges = false
 
-            // Disable editing completely
             titleEditText.isFocusable = false
             titleEditText.isFocusableInTouchMode = false
             titleEditText.isEnabled = false
@@ -236,16 +293,17 @@ class AddNoteActivity : AppCompatActivity() {
             contentEditText.isCursorVisible = false
             contentEditText.keyListener = null
 
-            // Make text selectable for copy-paste
             titleEditText.setTextIsSelectable(true)
             contentEditText.setTextIsSelectable(true)
 
-            // Update buttons - Edit button muncul di pojok kanan atas
-            formattingToolbar.visibility = View.GONE
-            saveButton.visibility = View.GONE
-            editButton.visibility = View.VISIBLE
+            // Animate button transition
+            AnimationUtils.fadeOut(saveButton, duration = 150)
+            saveButton.postDelayed({
+                AnimationUtils.fadeIn(editButton, duration = 200)
+            }, 150)
 
-            // Invalidate menu untuk menampilkan options (termasuk Hapus)
+            AnimationUtils.slideDown(formattingToolbar)
+
             invalidateOptionsMenu()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -256,7 +314,6 @@ class AddNoteActivity : AppCompatActivity() {
         try {
             isEditMode = true
 
-            // Enable editing
             titleEditText.apply {
                 isFocusable = true
                 isFocusableInTouchMode = true
@@ -273,14 +330,13 @@ class AddNoteActivity : AppCompatActivity() {
                 keyListener = contentKeyListener
             }
 
-            // Update buttons - Save button muncul di pojok kanan atas
-            saveButton.visibility = View.VISIBLE
-            editButton.visibility = View.GONE
+            // Animate button transition
+            AnimationUtils.fadeOut(editButton, duration = 150)
+            editButton.postDelayed({
+                AnimationUtils.fadeIn(saveButton, duration = 200)
+            }, 150)
 
-            // Hide menu options saat edit mode
             invalidateOptionsMenu()
-
-            // Show keyboard
             contentEditText.requestFocus()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -289,20 +345,25 @@ class AddNoteActivity : AppCompatActivity() {
 
     private fun setupButtonListeners() {
         try {
-            saveButton.setOnClickListener { saveNote() }
-            editButton.setOnClickListener { setEditMode() }
+            saveButton.setOnClickListener {
+                AnimationUtils.pressAnimation(it) {
+                    saveNote()
+                }
+            }
+
+            editButton.setOnClickListener {
+                AnimationUtils.pressAnimation(it) {
+                    setEditMode()
+                }
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    // Options Menu - untuk Hapus dan opsi lainnya
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        // Hanya tampilkan menu saat View Mode
         if (!isEditMode && existingNote != null) {
             menuInflater.inflate(R.menu.note_detail_menu, menu)
-
-            // Update pin/unpin text
             existingNote?.let { note ->
                 menu?.findItem(R.id.action_pin)?.title = if (note.isPinned) "Unpin" else "Pin"
             }
@@ -395,7 +456,6 @@ class AddNoteActivity : AppCompatActivity() {
                 SpannableStringBuilder(currentText)
             }
 
-            // Remove existing spans
             val existingSizeSpans = spannable.getSpans(start, end, AbsoluteSizeSpan::class.java)
             existingSizeSpans.forEach { spannable.removeSpan(it) }
 
@@ -438,30 +498,18 @@ class AddNoteActivity : AppCompatActivity() {
             val content = contentEditText.text?.toString()?.trim() ?: ""
 
             if (title.isEmpty()) {
+                AnimationUtils.shake(titleEditText)
                 Toast.makeText(this, R.string.empty_title_error, Toast.LENGTH_SHORT).show()
                 titleEditText.requestFocus()
                 return
             }
 
             if (content.isEmpty()) {
+                AnimationUtils.shake(contentEditText)
                 Toast.makeText(this, R.string.empty_content_error, Toast.LENGTH_SHORT).show()
                 contentEditText.requestFocus()
                 return
             }
-
-            // Button animation
-            saveButton.animate()
-                .scaleX(0.9f)
-                .scaleY(0.9f)
-                .setDuration(100)
-                .withEndAction {
-                    saveButton.animate()
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .setDuration(100)
-                        .start()
-                }
-                .start()
 
             lifecycleScope.launch {
                 try {
@@ -488,6 +536,7 @@ class AddNoteActivity : AppCompatActivity() {
                         repository.insertNote(note)
                         Toast.makeText(this@AddNoteActivity, "Catatan dibuat", Toast.LENGTH_SHORT).show()
                         finish()
+                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -523,6 +572,7 @@ class AddNoteActivity : AppCompatActivity() {
                         repository.moveToTrash(note)
                         Toast.makeText(this@AddNoteActivity, "Dipindahkan ke sampah", Toast.LENGTH_SHORT).show()
                         finish()
+                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     } catch (e: Exception) {
                         e.printStackTrace()
                         Toast.makeText(this@AddNoteActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -615,7 +665,21 @@ class AddNoteActivity : AppCompatActivity() {
                 .setTitle("Pilih Warna")
                 .setSingleChoiceItems(colorNames, currentIndex) { dialog, which ->
                     selectedColor = colors[which].second
-                    updateBackgroundColor()
+
+                    // Animate color change
+                    val oldColor = try {
+                        android.graphics.Color.parseColor(colors[currentIndex].second)
+                    } catch (e: Exception) {
+                        android.graphics.Color.WHITE
+                    }
+                    val newColor = try {
+                        android.graphics.Color.parseColor(selectedColor)
+                    } catch (e: Exception) {
+                        android.graphics.Color.WHITE
+                    }
+
+                    AnimationUtils.animateBackgroundColor(window.decorView, oldColor, newColor, duration = 400)
+
                     existingNote?.let { note ->
                         lifecycleScope.launch {
                             note.color = selectedColor
@@ -652,11 +716,13 @@ class AddNoteActivity : AppCompatActivity() {
                     }
                     .setNegativeButton("Buang") { _, _ ->
                         finish()
+                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                     }
                     .setNeutralButton("Batal", null)
                     .show()
             } else {
                 finish()
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             }
         } catch (e: Exception) {
             e.printStackTrace()

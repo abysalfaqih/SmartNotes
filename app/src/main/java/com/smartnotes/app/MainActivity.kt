@@ -82,16 +82,29 @@ class MainActivity : AppCompatActivity() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (dy > 0 && fabAddNote.isShown) {
-                    fabAddNote.hide()
-                } else if (dy < 0 && !fabAddNote.isShown) {
-                    fabAddNote.show()
+                    fabAddNote.animate()
+                        .scaleX(0.8f)
+                        .scaleY(0.8f)
+                        .alpha(0.7f)
+                        .setDuration(150)
+                        .start()
+                } else if (dy < 0 && fabAddNote.isShown) {
+                    fabAddNote.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .alpha(1f)
+                        .setDuration(150)
+                        .start()
                 }
             }
         })
 
         fabAddNote.setOnClickListener {
-            val intent = Intent(this, AddNoteActivity::class.java)
-            startActivity(intent)
+            AnimationUtils.pressAnimation(it) {
+                val intent = Intent(this, AddNoteActivity::class.java)
+                startActivity(intent)
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+            }
         }
 
         searchEditText.addTextChangedListener(object : TextWatcher {
@@ -108,6 +121,23 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repository.deleteExpiredNotes()
         }
+
+        // Animate FAB entrance
+        animateEntrance()
+    }
+
+    private fun animateEntrance() {
+        fabAddNote.scaleX = 0f
+        fabAddNote.scaleY = 0f
+        fabAddNote.alpha = 0f
+
+        fabAddNote.postDelayed({
+            AnimationUtils.bounce(fabAddNote, duration = 500)
+            fabAddNote.animate()
+                .alpha(1f)
+                .setDuration(300)
+                .start()
+        }, 400)
     }
 
     private fun setupRecyclerView() {
@@ -117,19 +147,39 @@ class MainActivity : AppCompatActivity() {
             LinearLayoutManager(this)
         }
         notesRecyclerView.adapter = adapter
+
+        // Set layout animation
+        val controller = android.view.animation.AnimationUtils.loadLayoutAnimation(
+            this,
+            R.anim.anim_card_item
+        )
+        notesRecyclerView.layoutAnimation = controller
     }
 
     private fun toggleView() {
         isGridView = !isGridView
         prefs.edit().putBoolean("is_grid_view", isGridView).apply()
 
-        notesRecyclerView.layoutManager = if (isGridView) {
-            StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-        } else {
-            LinearLayoutManager(this)
-        }
+        // Animate view change
+        notesRecyclerView.animate()
+            .alpha(0f)
+            .setDuration(150)
+            .withEndAction {
+                notesRecyclerView.layoutManager = if (isGridView) {
+                    StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+                } else {
+                    LinearLayoutManager(this)
+                }
+                notesRecyclerView.adapter = adapter
+                notesRecyclerView.scheduleLayoutAnimation()
 
-        notesRecyclerView.adapter = adapter
+                notesRecyclerView.animate()
+                    .alpha(1f)
+                    .setDuration(200)
+                    .start()
+            }
+            .start()
+
         invalidateOptionsMenu()
     }
 
@@ -212,6 +262,9 @@ class MainActivity : AppCompatActivity() {
             note.isPinned = !note.isPinned
             repository.updateNote(note)
             loadNotes()
+
+            val message = if (note.isPinned) "Catatan di-pin" else "Catatan di-unpin"
+            Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -230,6 +283,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repository.moveToTrash(note)
             loadNotes()
+            Toast.makeText(this@MainActivity, "Dipindahkan ke sampah", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -262,16 +316,35 @@ class MainActivity : AppCompatActivity() {
 
     private fun enterSelectionMode() {
         adapter.isSelectionMode = true
-        toolbar.visibility = View.GONE
-        selectionToolbar.visibility = View.VISIBLE
-        fabAddNote.hide()
+
+        // Animate toolbar transition
+        AnimationUtils.slideUp(selectionToolbar)
+        AnimationUtils.fadeOut(toolbar, duration = 150)
+
+        // Hide FAB with animation
+        fabAddNote.animate()
+            .scaleX(0f)
+            .scaleY(0f)
+            .alpha(0f)
+            .setDuration(200)
+            .withEndAction { fabAddNote.hide() }
+            .start()
     }
 
     private fun exitSelectionMode() {
         adapter.isSelectionMode = false
-        toolbar.visibility = View.VISIBLE
-        selectionToolbar.visibility = View.GONE
+
+        // Animate toolbar transition
+        AnimationUtils.fadeIn(toolbar, duration = 150)
+        AnimationUtils.slideDown(selectionToolbar)
+
+        // Show FAB with bounce animation
         fabAddNote.show()
+        fabAddNote.scaleX = 0f
+        fabAddNote.scaleY = 0f
+        fabAddNote.alpha = 0f
+        AnimationUtils.bounce(fabAddNote, duration = 400)
+        fabAddNote.animate().alpha(1f).setDuration(200).start()
     }
 
     private fun updateSelectionToolbar() {
@@ -314,19 +387,38 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateUI(notes: List<Note>) {
         if (notes.isEmpty()) {
-            notesRecyclerView.visibility = View.GONE
-            emptyStateLayout.visibility = View.VISIBLE
+            notesRecyclerView.animate()
+                .alpha(0f)
+                .setDuration(150)
+                .withEndAction {
+                    notesRecyclerView.visibility = View.GONE
+                    AnimationUtils.fadeIn(emptyStateLayout, duration = 300)
+                }
+                .start()
         } else {
-            notesRecyclerView.visibility = View.VISIBLE
-            emptyStateLayout.visibility = View.GONE
+            emptyStateLayout.animate()
+                .alpha(0f)
+                .setDuration(150)
+                .withEndAction {
+                    emptyStateLayout.visibility = View.GONE
+                    notesRecyclerView.visibility = View.VISIBLE
+                    notesRecyclerView.alpha = 0f
+                    notesRecyclerView.animate()
+                        .alpha(1f)
+                        .setDuration(200)
+                        .start()
+                }
+                .start()
         }
         adapter.updateNotes(notes)
+        notesRecyclerView.scheduleLayoutAnimation()
     }
 
     private fun openNoteDetail(note: Note) {
         val intent = Intent(this, AddNoteActivity::class.java)
         intent.putExtra("note", note)
         startActivity(intent)
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
     private fun showDeleteSelectedConfirmation() {
@@ -353,6 +445,7 @@ class MainActivity : AppCompatActivity() {
             }
             exitSelectionMode()
             loadNotes()
+            Toast.makeText(this@MainActivity, "${notes.size} catatan dipindahkan ke sampah", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -363,16 +456,20 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            // View Toggle
             R.id.view_grid -> {
-                if (!isGridView) toggleView()
+                if (!isGridView) {
+                    AnimationUtils.pulse(findViewById(android.R.id.content))
+                    toggleView()
+                }
                 true
             }
             R.id.view_list -> {
-                if (isGridView) toggleView()
+                if (isGridView) {
+                    AnimationUtils.pulse(findViewById(android.R.id.content))
+                    toggleView()
+                }
                 true
             }
-            // Sort Options
             R.id.sort_date_newest -> {
                 currentSortMode = SortMode.DATE_NEWEST
                 sortAndDisplayNotes()
@@ -394,11 +491,15 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.action_trash -> {
-                startActivity(Intent(this, TrashActivity::class.java))
+                val intent = Intent(this, TrashActivity::class.java)
+                startActivity(intent)
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                 true
             }
             R.id.action_about -> {
-                startActivity(Intent(this, AboutActivity::class.java))
+                val intent = Intent(this, AboutActivity::class.java)
+                startActivity(intent)
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                 true
             }
             else -> super.onOptionsItemSelected(item)
