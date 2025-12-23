@@ -70,7 +70,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Catatan di sampah akan otomatis terhapus permanen setelah 30 hari"
+                        android:text="Sampah akan terhapus permanen setelah 30 hari"
                         android:textSize="13sp"
                         android:textColor="@color/text_secondary"
                         android:lineSpacingExtra="2dp" />

@@ -46,12 +46,24 @@ class AddNoteActivity : AppCompatActivity() {
     private var hasUnsavedChanges = false
     private var originalTitle = ""
     private var originalContent = ""
+    private var titleKeyListener: android.text.method.KeyListener? = null
+    private var contentKeyListener: android.text.method.KeyListener? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         try {
             setContentView(R.layout.activity_add_note)
+
+            onBackPressedDispatcher.addCallback(
+                this,
+                object : androidx.activity.OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        handleBackPress()
+                    }
+                }
+            )
 
             val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
             setSupportActionBar(toolbar)
@@ -106,6 +118,10 @@ class AddNoteActivity : AppCompatActivity() {
                     formattingToolbar.visibility = View.VISIBLE
                 }
             }
+
+            titleKeyListener = titleEditText.keyListener
+            contentKeyListener = contentEditText.keyListener
+
         } catch (e: Exception) {
             e.printStackTrace()
             throw Exception("Error initializing views: ${e.message}")
@@ -207,11 +223,20 @@ class AddNoteActivity : AppCompatActivity() {
             isEditMode = false
             hasUnsavedChanges = false
 
-            // Disable editing
+            // Disable editing completely
             titleEditText.isFocusable = false
             titleEditText.isFocusableInTouchMode = false
+            titleEditText.isEnabled = false
+            titleEditText.isCursorVisible = false
+            titleEditText.keyListener = null
+
             contentEditText.isFocusable = false
             contentEditText.isFocusableInTouchMode = false
+            contentEditText.isEnabled = false
+            contentEditText.isCursorVisible = false
+            contentEditText.keyListener = null
+
+            // Make text selectable for copy-paste
             titleEditText.setTextIsSelectable(true)
             contentEditText.setTextIsSelectable(true)
 
@@ -232,12 +257,21 @@ class AddNoteActivity : AppCompatActivity() {
             isEditMode = true
 
             // Enable editing
-            titleEditText.isFocusable = true
-            titleEditText.isFocusableInTouchMode = true
-            contentEditText.isFocusable = true
-            contentEditText.isFocusableInTouchMode = true
-            titleEditText.setTextIsSelectable(true)
-            contentEditText.setTextIsSelectable(true)
+            titleEditText.apply {
+                isFocusable = true
+                isFocusableInTouchMode = true
+                isEnabled = true
+                isCursorVisible = true
+                keyListener = titleKeyListener
+            }
+
+            contentEditText.apply {
+                isFocusable = true
+                isFocusableInTouchMode = true
+                isEnabled = true
+                isCursorVisible = true
+                keyListener = contentKeyListener
+            }
 
             // Update buttons - Save button muncul di pojok kanan atas
             saveButton.visibility = View.VISIBLE
@@ -628,10 +662,5 @@ class AddNoteActivity : AppCompatActivity() {
             e.printStackTrace()
             finish()
         }
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        handleBackPress()
     }
 }

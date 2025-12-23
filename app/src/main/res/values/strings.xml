@@ -61,7 +61,7 @@
     <string name="note_permanently_deleted">Catatan dihapus permanen</string>
     <string name="trash_emptied">Sampah dikosongkan</string>
     <string name="days_until_delete">Dihapus permanen dalam %d hari</string>
-    <string name="trash_info">Sampah terhapus permanen setelah 30 hari</string>
+    <string name="trash_info">Sampah akan terhapus permanen setelah 30 hari</string>
     <string name="move_to_trash">Pindahkan ke Sampah</string>
 
     <!-- Rich Text Editor -->

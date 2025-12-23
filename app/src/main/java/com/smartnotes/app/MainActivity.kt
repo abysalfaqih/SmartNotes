@@ -134,12 +134,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showNoteOptionsDialog(note: Note) {
-        val pinOption = if (note.isPinned) "📌 Unpin" else "📌 Pin"
+        val pinOption = if (note.isPinned) "Unpin" else "Pin"
         val options = arrayOf(
             pinOption,
-            "📁 Ubah Kategori",
-            "🎨 Ubah Warna",
-            "🗑️ Pindahkan ke Sampah"
+            "Ubah Kategori",
+            "Ubah Warna",
+            "Pindahkan ke Sampah"
         )
 
         AlertDialog.Builder(this)
