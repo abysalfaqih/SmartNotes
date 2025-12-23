@@ -12,19 +12,20 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 
 object AnimationUtils {
 
+    // Optimized durations
+    private const val DURATION_FAST = 150L
+    private const val DURATION_NORMAL = 250L
+    private const val DURATION_SLOW = 350L
+
     /**
-     * Fade in animation with scale
+     * Fade in animation - Optimized
      */
-    fun fadeIn(view: View, duration: Long = 300, onEnd: (() -> Unit)? = null) {
+    fun fadeIn(view: View, duration: Long = DURATION_NORMAL, onEnd: (() -> Unit)? = null) {
         view.alpha = 0f
-        view.scaleX = 0.95f
-        view.scaleY = 0.95f
         view.visibility = View.VISIBLE
 
         view.animate()
             .alpha(1f)
-            .scaleX(1f)
-            .scaleY(1f)
             .setDuration(duration)
             .setInterpolator(DecelerateInterpolator())
             .setListener(object : AnimatorListenerAdapter() {
@@ -36,21 +37,17 @@ object AnimationUtils {
     }
 
     /**
-     * Fade out animation with scale
+     * Fade out animation - Optimized
      */
-    fun fadeOut(view: View, duration: Long = 200, onEnd: (() -> Unit)? = null) {
+    fun fadeOut(view: View, duration: Long = DURATION_FAST, onEnd: (() -> Unit)? = null) {
         view.animate()
             .alpha(0f)
-            .scaleX(0.95f)
-            .scaleY(0.95f)
             .setDuration(duration)
             .setInterpolator(AccelerateDecelerateInterpolator())
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
                     view.visibility = View.GONE
                     view.alpha = 1f
-                    view.scaleX = 1f
-                    view.scaleY = 1f
                     onEnd?.invoke()
                 }
             })
@@ -58,10 +55,10 @@ object AnimationUtils {
     }
 
     /**
-     * Slide up animation
+     * Slide up animation - Optimized
      */
-    fun slideUp(view: View, duration: Long = 350, onEnd: (() -> Unit)? = null) {
-        view.translationY = view.height.toFloat() * 0.3f
+    fun slideUp(view: View, duration: Long = DURATION_NORMAL, onEnd: (() -> Unit)? = null) {
+        view.translationY = view.height.toFloat() * 0.2f
         view.alpha = 0f
         view.visibility = View.VISIBLE
 
@@ -79,11 +76,11 @@ object AnimationUtils {
     }
 
     /**
-     * Slide down animation
+     * Slide down animation - Optimized
      */
-    fun slideDown(view: View, duration: Long = 250, onEnd: (() -> Unit)? = null) {
+    fun slideDown(view: View, duration: Long = DURATION_NORMAL, onEnd: (() -> Unit)? = null) {
         view.animate()
-            .translationY(view.height.toFloat() * 0.3f)
+            .translationY(view.height.toFloat() * 0.2f)
             .alpha(0f)
             .setDuration(duration)
             .setInterpolator(AccelerateDecelerateInterpolator())
@@ -99,9 +96,9 @@ object AnimationUtils {
     }
 
     /**
-     * Bounce animation
+     * Bounce animation - Simplified and optimized
      */
-    fun bounce(view: View, duration: Long = 400) {
+    fun bounce(view: View, duration: Long = DURATION_NORMAL) {
         view.scaleX = 0f
         view.scaleY = 0f
         view.visibility = View.VISIBLE
@@ -110,14 +107,14 @@ object AnimationUtils {
             .scaleX(1f)
             .scaleY(1f)
             .setDuration(duration)
-            .setInterpolator(OvershootInterpolator())
+            .setInterpolator(OvershootInterpolator(1.5f))
             .start()
     }
 
     /**
-     * Pulse animation - for highlighting
+     * Pulse animation - Optimized with smaller scale
      */
-    fun pulse(view: View, scaleTo: Float = 1.1f, duration: Long = 200) {
+    fun pulse(view: View, scaleTo: Float = 1.08f, duration: Long = DURATION_FAST) {
         view.animate()
             .scaleX(scaleTo)
             .scaleY(scaleTo)
@@ -135,31 +132,17 @@ object AnimationUtils {
     }
 
     /**
-     * Shake animation - for errors
+     * Shake animation - Simplified
      */
-    fun shake(view: View, duration: Long = 500) {
-        val animator = ObjectAnimator.ofFloat(view, "translationX", 0f, 25f, -25f, 25f, -25f, 15f, -15f, 6f, -6f, 0f)
+    fun shake(view: View, duration: Long = 400) {
+        val animator = ObjectAnimator.ofFloat(view, "translationX", 0f, 15f, -15f, 10f, -10f, 5f, -5f, 0f)
         animator.duration = duration
         animator.interpolator = FastOutSlowInInterpolator()
         animator.start()
     }
 
     /**
-     * Rotate animation
-     */
-    fun rotate(view: View, fromDegrees: Float = 0f, toDegrees: Float = 360f, duration: Long = 500) {
-        view.animate()
-            .rotation(toDegrees)
-            .setDuration(duration)
-            .setInterpolator(FastOutSlowInInterpolator())
-            .withEndAction {
-                view.rotation = fromDegrees
-            }
-            .start()
-    }
-
-    /**
-     * Press animation - like button press
+     * Press animation - Optimized
      */
     fun pressAnimation(view: View, onEnd: (() -> Unit)? = null) {
         view.animate()
@@ -172,7 +155,7 @@ object AnimationUtils {
                     .scaleX(1f)
                     .scaleY(1f)
                     .setDuration(100)
-                    .setInterpolator(OvershootInterpolator())
+                    .setInterpolator(OvershootInterpolator(1.2f))
                     .setListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator) {
                             onEnd?.invoke()
@@ -184,21 +167,12 @@ object AnimationUtils {
     }
 
     /**
-     * Flip animation
+     * Color change animation - Optimized
      */
-    fun flip(view: View, duration: Long = 400) {
-        val animator = ObjectAnimator.ofFloat(view, "rotationY", 0f, 360f)
-        animator.duration = duration
-        animator.interpolator = FastOutSlowInInterpolator()
-        animator.start()
-    }
-
-    /**
-     * Color change animation (for background)
-     */
-    fun animateBackgroundColor(view: View, fromColor: Int, toColor: Int, duration: Long = 300) {
+    fun animateBackgroundColor(view: View, fromColor: Int, toColor: Int, duration: Long = DURATION_NORMAL) {
         val animator = ValueAnimator.ofArgb(fromColor, toColor)
         animator.duration = duration
+        animator.interpolator = FastOutSlowInInterpolator()
         animator.addUpdateListener { animation ->
             view.setBackgroundColor(animation.animatedValue as Int)
         }
@@ -206,10 +180,10 @@ object AnimationUtils {
     }
 
     /**
-     * Slide in from right
+     * Slide in from right - Optimized
      */
-    fun slideInFromRight(view: View, duration: Long = 300, onEnd: (() -> Unit)? = null) {
-        view.translationX = view.width.toFloat()
+    fun slideInFromRight(view: View, duration: Long = DURATION_NORMAL, onEnd: (() -> Unit)? = null) {
+        view.translationX = view.width.toFloat() * 0.3f
         view.alpha = 0f
         view.visibility = View.VISIBLE
 
@@ -227,11 +201,11 @@ object AnimationUtils {
     }
 
     /**
-     * Slide out to right
+     * Slide out to right - Optimized
      */
-    fun slideOutToRight(view: View, duration: Long = 250, onEnd: (() -> Unit)? = null) {
+    fun slideOutToRight(view: View, duration: Long = DURATION_FAST, onEnd: (() -> Unit)? = null) {
         view.animate()
-            .translationX(view.width.toFloat())
+            .translationX(view.width.toFloat() * 0.3f)
             .alpha(0f)
             .setDuration(duration)
             .setInterpolator(AccelerateDecelerateInterpolator())
@@ -247,30 +221,11 @@ object AnimationUtils {
     }
 
     /**
-     * Reveal animation (circular reveal for API 21+)
+     * Zoom in animation - Simplified
      */
-    fun reveal(view: View, duration: Long = 400) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            val cx = view.width / 2
-            val cy = view.height / 2
-            val finalRadius = Math.hypot(cx.toDouble(), cy.toDouble()).toFloat()
-
-            val anim = android.view.ViewAnimationUtils.createCircularReveal(view, cx, cy, 0f, finalRadius)
-            view.visibility = View.VISIBLE
-            anim.duration = duration
-            anim.interpolator = FastOutSlowInInterpolator()
-            anim.start()
-        } else {
-            fadeIn(view, duration)
-        }
-    }
-
-    /**
-     * Zoom in animation
-     */
-    fun zoomIn(view: View, duration: Long = 300, onEnd: (() -> Unit)? = null) {
-        view.scaleX = 0f
-        view.scaleY = 0f
+    fun zoomIn(view: View, duration: Long = DURATION_NORMAL, onEnd: (() -> Unit)? = null) {
+        view.scaleX = 0.8f
+        view.scaleY = 0.8f
         view.alpha = 0f
         view.visibility = View.VISIBLE
 
@@ -279,7 +234,7 @@ object AnimationUtils {
             .scaleY(1f)
             .alpha(1f)
             .setDuration(duration)
-            .setInterpolator(OvershootInterpolator())
+            .setInterpolator(OvershootInterpolator(1.5f))
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
                     onEnd?.invoke()
@@ -289,12 +244,12 @@ object AnimationUtils {
     }
 
     /**
-     * Zoom out animation
+     * Zoom out animation - Simplified
      */
-    fun zoomOut(view: View, duration: Long = 200, onEnd: (() -> Unit)? = null) {
+    fun zoomOut(view: View, duration: Long = DURATION_FAST, onEnd: (() -> Unit)? = null) {
         view.animate()
-            .scaleX(0f)
-            .scaleY(0f)
+            .scaleX(0.8f)
+            .scaleY(0.8f)
             .alpha(0f)
             .setDuration(duration)
             .setInterpolator(AccelerateDecelerateInterpolator())
