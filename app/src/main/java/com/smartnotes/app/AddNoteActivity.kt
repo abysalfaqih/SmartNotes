@@ -94,22 +94,35 @@ class AddNoteActivity : AppCompatActivity() {
     }
 
     private fun animateEntrance() {
-        // Simplified entrance - only animate the most important elements
+        // Simplified entrance - smooth and fast
         contentEditText.alpha = 0f
+        contentEditText.translationY = 20f
+
         contentEditText.postDelayed({
-            AnimationUtils.fadeIn(contentEditText, duration = 250)
+            contentEditText.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(200)
+                .setInterpolator(android.view.animation.DecelerateInterpolator())
+                .start()
         }, 50)
 
-        // Animate button without complex sequences
+        // Animate button - simple fade
         if (existingNote != null) {
             editButton.alpha = 0f
             editButton.postDelayed({
-                AnimationUtils.fadeIn(editButton, duration = 200)
+                editButton.animate()
+                    .alpha(1f)
+                    .setDuration(150)
+                    .start()
             }, 150)
         } else {
             saveButton.alpha = 0f
             saveButton.postDelayed({
-                AnimationUtils.fadeIn(saveButton, duration = 200)
+                saveButton.animate()
+                    .alpha(1f)
+                    .setDuration(150)
+                    .start()
             }, 150)
         }
     }
@@ -131,13 +144,29 @@ class AddNoteActivity : AppCompatActivity() {
 
             contentEditText.setOnFocusChangeListener { _, hasFocus ->
                 if (isEditMode && hasFocus) {
-                    AnimationUtils.slideUp(formattingToolbar)
+                    formattingToolbar.visibility = View.VISIBLE
+                    formattingToolbar.translationY = formattingToolbar.height.toFloat()
+                    formattingToolbar.alpha = 0f
+                    formattingToolbar.animate()
+                        .translationY(0f)
+                        .alpha(1f)
+                        .setDuration(200)
+                        .setInterpolator(android.view.animation.DecelerateInterpolator())
+                        .start()
                 }
             }
 
             titleEditText.setOnFocusChangeListener { _, hasFocus ->
                 if (isEditMode && !hasFocus && contentEditText.hasFocus()) {
-                    AnimationUtils.slideUp(formattingToolbar)
+                    formattingToolbar.visibility = View.VISIBLE
+                    formattingToolbar.translationY = formattingToolbar.height.toFloat()
+                    formattingToolbar.alpha = 0f
+                    formattingToolbar.animate()
+                        .translationY(0f)
+                        .alpha(1f)
+                        .setDuration(200)
+                        .setInterpolator(android.view.animation.DecelerateInterpolator())
+                        .start()
                 }
             }
 
@@ -152,24 +181,41 @@ class AddNoteActivity : AppCompatActivity() {
 
     private fun setupToolbarButtons() {
         try {
-            // Simplified toolbar animations - no touch listener overhead
+            // Simple click animations - no complex touch listeners
             btnCheckList.setOnClickListener {
-                AnimationUtils.pulse(it, scaleTo = 1.05f, duration = 100)
+                it.animate()
+                    .scaleX(0.9f)
+                    .scaleY(0.9f)
+                    .setDuration(80)
+                    .withEndAction {
+                        it.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(80)
+                            .start()
+                    }
+                    .start()
                 insertCheckbox()
             }
 
             btnH1.setOnClickListener {
-                AnimationUtils.pulse(it, scaleTo = 1.05f, duration = 100)
+                it.animate().scaleX(0.9f).scaleY(0.9f).setDuration(80)
+                    .withEndAction { it.animate().scaleX(1f).scaleY(1f).setDuration(80).start() }
+                    .start()
                 applyHeading(1)
             }
 
             btnH2.setOnClickListener {
-                AnimationUtils.pulse(it, scaleTo = 1.05f, duration = 100)
+                it.animate().scaleX(0.9f).scaleY(0.9f).setDuration(80)
+                    .withEndAction { it.animate().scaleX(1f).scaleY(1f).setDuration(80).start() }
+                    .start()
                 applyHeading(2)
             }
 
             btnH3.setOnClickListener {
-                AnimationUtils.pulse(it, scaleTo = 1.05f, duration = 100)
+                it.animate().scaleX(0.9f).scaleY(0.9f).setDuration(80)
+                    .withEndAction { it.animate().scaleX(1f).scaleY(1f).setDuration(80).start() }
+                    .start()
                 applyHeading(3)
             }
 
@@ -178,15 +224,30 @@ class AddNoteActivity : AppCompatActivity() {
                 val end = contentEditText.selectionEnd
 
                 if (start >= 0 && end > start) {
-                    AnimationUtils.pulse(it, scaleTo = 1.05f, duration = 100)
+                    it.animate().scaleX(0.9f).scaleY(0.9f).setDuration(80)
+                        .withEndAction { it.animate().scaleX(1f).scaleY(1f).setDuration(80).start() }
+                        .start()
                     contentEditText.applyBold()
                     hasUnsavedChanges = true
                 }
             }
 
             btnClose.setOnClickListener {
-                AnimationUtils.pulse(it, scaleTo = 0.95f, duration = 100)
-                AnimationUtils.slideDown(formattingToolbar)
+                it.animate().alpha(0.5f).setDuration(100)
+                    .withEndAction { it.animate().alpha(1f).setDuration(100).start() }
+                    .start()
+
+                formattingToolbar.animate()
+                    .translationY(formattingToolbar.height.toFloat())
+                    .alpha(0f)
+                    .setDuration(200)
+                    .withEndAction {
+                        formattingToolbar.visibility = android.view.View.GONE
+                        formattingToolbar.translationY = 0f
+                        formattingToolbar.alpha = 1f
+                    }
+                    .start()
+
                 contentEditText.clearFocus()
             }
         } catch (e: Exception) {
@@ -275,13 +336,29 @@ class AddNoteActivity : AppCompatActivity() {
             titleEditText.setTextIsSelectable(true)
             contentEditText.setTextIsSelectable(true)
 
-            // Simplified button transition
-            saveButton.visibility = View.GONE
-            editButton.visibility = View.VISIBLE
-            editButton.alpha = 0f
-            editButton.animate().alpha(1f).setDuration(200).start()
+            // Simple fade transition
+            saveButton.animate().alpha(0f).setDuration(100)
+                .withEndAction {
+                    saveButton.visibility = View.GONE
+                    editButton.visibility = View.VISIBLE
+                    editButton.alpha = 0f
+                    editButton.animate().alpha(1f).setDuration(150).start()
+                }
+                .start()
 
-            AnimationUtils.slideDown(formattingToolbar)
+            // Hide formatting toolbar smoothly
+            if (formattingToolbar.visibility == View.VISIBLE) {
+                formattingToolbar.animate()
+                    .translationY(formattingToolbar.height.toFloat())
+                    .alpha(0f)
+                    .setDuration(150)
+                    .withEndAction {
+                        formattingToolbar.visibility = View.GONE
+                        formattingToolbar.translationY = 0f
+                        formattingToolbar.alpha = 1f
+                    }
+                    .start()
+            }
 
             invalidateOptionsMenu()
         } catch (e: Exception) {
@@ -309,11 +386,15 @@ class AddNoteActivity : AppCompatActivity() {
                 keyListener = contentKeyListener
             }
 
-            // Simplified button transition
-            editButton.visibility = View.GONE
-            saveButton.visibility = View.VISIBLE
-            saveButton.alpha = 0f
-            saveButton.animate().alpha(1f).setDuration(200).start()
+            // Simple fade transition
+            editButton.animate().alpha(0f).setDuration(100)
+                .withEndAction {
+                    editButton.visibility = View.GONE
+                    saveButton.visibility = View.VISIBLE
+                    saveButton.alpha = 0f
+                    saveButton.animate().alpha(1f).setDuration(150).start()
+                }
+                .start()
 
             invalidateOptionsMenu()
             contentEditText.requestFocus()
@@ -326,15 +407,37 @@ class AddNoteActivity : AppCompatActivity() {
     private fun setupButtonListeners() {
         try {
             saveButton.setOnClickListener {
-                AnimationUtils.pressAnimation(it) {
-                    saveNote()
-                }
+                // Simple press effect
+                it.animate()
+                    .scaleX(0.95f)
+                    .scaleY(0.95f)
+                    .setDuration(100)
+                    .withEndAction {
+                        it.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(100)
+                            .withEndAction { saveNote() }
+                            .start()
+                    }
+                    .start()
             }
 
             editButton.setOnClickListener {
-                AnimationUtils.pressAnimation(it) {
-                    setEditMode()
-                }
+                // Simple press effect
+                it.animate()
+                    .scaleX(0.95f)
+                    .scaleY(0.95f)
+                    .setDuration(100)
+                    .withEndAction {
+                        it.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(100)
+                            .withEndAction { setEditMode() }
+                            .start()
+                    }
+                    .start()
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -491,6 +594,9 @@ class AddNoteActivity : AppCompatActivity() {
                 return
             }
 
+            // Disable button to prevent double-click
+            saveButton.isEnabled = false
+
             lifecycleScope.launch {
                 try {
                     if (existingNote != null) {
@@ -507,6 +613,7 @@ class AddNoteActivity : AppCompatActivity() {
 
                         Toast.makeText(this@AddNoteActivity, "Catatan disimpan", Toast.LENGTH_SHORT).show()
                         setViewMode()
+                        saveButton.isEnabled = true
                     } else {
                         // CREATE new note - ALWAYS finish after save
                         val note = Note(
@@ -520,19 +627,24 @@ class AddNoteActivity : AppCompatActivity() {
                         // Mark as saved to prevent unsaved changes dialog
                         hasUnsavedChanges = false
 
+                        // Show toast before finishing
                         Toast.makeText(this@AddNoteActivity, "Catatan dibuat", Toast.LENGTH_SHORT).show()
 
-                        // IMPORTANT: Finish activity to return to MainActivity
-                        finish()
-                        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                        // Use handler to ensure smooth transition
+                        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                            finish()
+                            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                        }, 100)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
+                    saveButton.isEnabled = true
                     Toast.makeText(this@AddNoteActivity, "Error saving: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            saveButton.isEnabled = true
             Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
@@ -654,7 +766,7 @@ class AddNoteActivity : AppCompatActivity() {
                 .setSingleChoiceItems(colorNames, currentIndex) { dialog, which ->
                     selectedColor = colors[which].second
 
-                    // Simplified color change - no complex animation
+                    // Simple color change - no animation
                     updateBackgroundColor()
 
                     existingNote?.let { note ->

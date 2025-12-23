@@ -81,30 +81,42 @@ class MainActivity : AppCompatActivity() {
         notesRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                if (dy > 0 && fabAddNote.isShown) {
+                // Simple FAB animation on scroll - smoother
+                if (dy > 5 && fabAddNote.isShown) {
                     fabAddNote.animate()
-                        .scaleX(0.8f)
-                        .scaleY(0.8f)
-                        .alpha(0.7f)
-                        .setDuration(150)
+                        .scaleX(0.85f)
+                        .scaleY(0.85f)
+                        .setDuration(100)
                         .start()
-                } else if (dy < 0 && fabAddNote.isShown) {
+                } else if (dy < -5 && fabAddNote.isShown) {
                     fabAddNote.animate()
                         .scaleX(1f)
                         .scaleY(1f)
-                        .alpha(1f)
-                        .setDuration(150)
+                        .setDuration(100)
                         .start()
                 }
             }
         })
 
         fabAddNote.setOnClickListener {
-            AnimationUtils.pressAnimation(it) {
-                val intent = Intent(this, AddNoteActivity::class.java)
-                startActivity(intent)
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-            }
+            // Simple press animation
+            it.animate()
+                .scaleX(0.9f)
+                .scaleY(0.9f)
+                .setDuration(100)
+                .withEndAction {
+                    it.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(100)
+                        .withEndAction {
+                            val intent = Intent(this, AddNoteActivity::class.java)
+                            startActivity(intent)
+                            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+                        }
+                        .start()
+                }
+                .start()
         }
 
         searchEditText.addTextChangedListener(object : TextWatcher {
@@ -127,20 +139,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun animateEntrance() {
-        // Simplified FAB entrance
+        // Simple FAB entrance - smooth and professional
         fabAddNote.scaleX = 0f
         fabAddNote.scaleY = 0f
-        fabAddNote.alpha = 0f
 
         fabAddNote.postDelayed({
             fabAddNote.animate()
                 .scaleX(1f)
                 .scaleY(1f)
-                .alpha(1f)
-                .setDuration(250)
-                .setInterpolator(android.view.animation.OvershootInterpolator(1.5f))
+                .setDuration(200)
+                .setInterpolator(android.view.animation.OvershootInterpolator(1.2f))
                 .start()
-        }, 300)
+        }, 200)
     }
 
     private fun setupRecyclerView() {
@@ -163,14 +173,26 @@ class MainActivity : AppCompatActivity() {
         isGridView = !isGridView
         prefs.edit().putBoolean("is_grid_view", isGridView).apply()
 
-        // Simplified view change - no complex animation
-        notesRecyclerView.layoutManager = if (isGridView) {
-            StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-        } else {
-            LinearLayoutManager(this)
-        }
+        // Smooth view change with fade
+        notesRecyclerView.animate()
+            .alpha(0f)
+            .setDuration(100)
+            .withEndAction {
+                notesRecyclerView.layoutManager = if (isGridView) {
+                    StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+                } else {
+                    LinearLayoutManager(this)
+                }
 
-        adapter.notifyDataSetChanged()
+                adapter.notifyDataSetChanged()
+
+                notesRecyclerView.animate()
+                    .alpha(1f)
+                    .setDuration(150)
+                    .start()
+            }
+            .start()
+
         invalidateOptionsMenu()
     }
 
@@ -308,17 +330,20 @@ class MainActivity : AppCompatActivity() {
     private fun enterSelectionMode() {
         adapter.isSelectionMode = true
 
-        // Simplified toolbar transition
-        toolbar.visibility = View.GONE
-        selectionToolbar.visibility = View.VISIBLE
-        selectionToolbar.alpha = 0f
-        selectionToolbar.animate().alpha(1f).setDuration(200).start()
+        // Smooth toolbar transition
+        toolbar.animate().alpha(0f).setDuration(100)
+            .withEndAction {
+                toolbar.visibility = View.GONE
+                selectionToolbar.visibility = View.VISIBLE
+                selectionToolbar.alpha = 0f
+                selectionToolbar.animate().alpha(1f).setDuration(150).start()
+            }
+            .start()
 
-        // Simplified FAB hide
+        // Smooth FAB hide
         fabAddNote.animate()
             .scaleX(0f)
             .scaleY(0f)
-            .alpha(0f)
             .setDuration(150)
             .withEndAction { fabAddNote.hide() }
             .start()
@@ -327,23 +352,25 @@ class MainActivity : AppCompatActivity() {
     private fun exitSelectionMode() {
         adapter.isSelectionMode = false
 
-        // Simplified toolbar transition
-        selectionToolbar.visibility = View.GONE
-        toolbar.visibility = View.VISIBLE
-        toolbar.alpha = 0f
-        toolbar.animate().alpha(1f).setDuration(200).start()
+        // Smooth toolbar transition
+        selectionToolbar.animate().alpha(0f).setDuration(100)
+            .withEndAction {
+                selectionToolbar.visibility = View.GONE
+                toolbar.visibility = View.VISIBLE
+                toolbar.alpha = 0f
+                toolbar.animate().alpha(1f).setDuration(150).start()
+            }
+            .start()
 
-        // Simplified FAB show
+        // Smooth FAB show
         fabAddNote.show()
         fabAddNote.scaleX = 0f
         fabAddNote.scaleY = 0f
-        fabAddNote.alpha = 0f
         fabAddNote.animate()
             .scaleX(1f)
             .scaleY(1f)
-            .alpha(1f)
-            .setDuration(250)
-            .setInterpolator(android.view.animation.OvershootInterpolator(1.5f))
+            .setDuration(200)
+            .setInterpolator(android.view.animation.OvershootInterpolator(1.2f))
             .start()
     }
 
@@ -387,25 +414,34 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateUI(notes: List<Note>) {
         if (notes.isEmpty()) {
-            // Simplified transition to empty state
-            notesRecyclerView.visibility = View.GONE
-            emptyStateLayout.visibility = View.VISIBLE
-            emptyStateLayout.alpha = 0f
-            emptyStateLayout.animate().alpha(1f).setDuration(200).start()
+            // Smooth transition to empty state
+            notesRecyclerView.animate().alpha(0f).setDuration(100)
+                .withEndAction {
+                    notesRecyclerView.visibility = View.GONE
+                    emptyStateLayout.visibility = View.VISIBLE
+                    emptyStateLayout.alpha = 0f
+                    emptyStateLayout.animate().alpha(1f).setDuration(150).start()
+                }
+                .start()
         } else {
-            // Simplified transition to list
-            emptyStateLayout.visibility = View.GONE
-            notesRecyclerView.visibility = View.VISIBLE
+            // Smooth transition to list
+            emptyStateLayout.animate().alpha(0f).setDuration(100)
+                .withEndAction {
+                    emptyStateLayout.visibility = View.GONE
+                    notesRecyclerView.visibility = View.VISIBLE
 
-            if (notesRecyclerView.alpha == 0f) {
-                notesRecyclerView.alpha = 0f
-                notesRecyclerView.animate().alpha(1f).setDuration(200).start()
-            }
+                    if (notesRecyclerView.alpha == 0f) {
+                        notesRecyclerView.alpha = 0f
+                        notesRecyclerView.animate().alpha(1f).setDuration(150).start()
+                    }
+                }
+                .start()
         }
+
         adapter.updateNotes(notes)
 
-        // Only animate layout on first load or after significant changes
-        if (notes.isEmpty() || adapter.itemCount == 0) {
+        // Animate only on significant changes
+        if (notes.size <= 3 || adapter.itemCount == 0) {
             notesRecyclerView.scheduleLayoutAnimation()
         }
     }
@@ -454,14 +490,12 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.view_grid -> {
                 if (!isGridView) {
-                    AnimationUtils.pulse(findViewById(android.R.id.content))
                     toggleView()
                 }
                 true
             }
             R.id.view_list -> {
                 if (isGridView) {
-                    AnimationUtils.pulse(findViewById(android.R.id.content))
                     toggleView()
                 }
                 true
